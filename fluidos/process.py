@@ -1,4 +1,4 @@
-_#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Thu Sep 16 17:53:14 2021
@@ -13,6 +13,10 @@ import numpy as np
 import matplotlib.patches as patches
 import cv2
 from os import listdir
+
+#%%
+
+#%cd ~/facultad/labo_5/git_labo_5/fluidos
 
 #%%
 #funcion para extraer los frames de un video
@@ -55,17 +59,10 @@ def process(frame_a, frame_b, winsize, searchsize, dt, overlap, save_path, perce
 #%%
 
 
-save_path = "../../14-9/videos 14-09/experimento 1/campo0/"
-winsize = 16
-searchsize = 16
-overlap=8
-fps = 72
-dt = 1/fps
-percentile = 15
-frames_urls = sorted(listdir(frames_path))
+
 
 def frames_a_campos(frames_path, save_path, winsize=16, searchsize = 16,
-                overlap=8, cantidad=72, dt = 1/72, percentile = 15):
+                overlap=8, cantidad=int(72), dt = 1/72, percentile = 15):
     '''
     Convierte todos los frames ubicados en una carpeta a archivos txt con el 
     campo de velocidades entre cada uno de los frames con nombre 000.txt para
@@ -95,18 +92,19 @@ def frames_a_campos(frames_path, save_path, winsize=16, searchsize = 16,
     None.
 
     '''
-    
+    frames_urls = sorted(listdir(frames_path))
     for index in range(1, cantidad):
         number = str(index).zfill(3)
-        save_path = f"../../14-9/videos 14-09/experimento 1/campo0/par{number}.txt"
         frame_a_url = frames_path+frames_urls[index-1]
         frame_b_url = frames_path+frames_urls[index]
         frame_a = tools.imread(frame_a_url)
         frame_b = tools.imread(frame_b_url)
         
-        process(frame_a, frame_b, winsize, searchsize, dt, overlap, save_path, percentile)
+        process(frame_a, frame_b, winsize, searchsize, dt, overlap, save_path+f"{number}.txt", percentile)
     
     return
+
+
 
 #%%
 
@@ -141,31 +139,6 @@ def mean_vector_field(filepath):
     return mean
 #%%
 
-def dist_al_centro(imgpath, filepath, savepath):
-    
-    x, y = encontrar_centro(imgpath)
-    
-    ordered_paths = sorted(listdir(filepath))[1:]
-    
-    for index, file in enumerate(ordered_paths):
-        number = str(index).zfill(3)
-        con_dist = np.loadtxt(filepath+file)
-        print(con_dist.shape, np.zeros((con_dist.shape[0],1)).shape)
-        con_dist = np.hstack((con_dist, np.zeros((con_dist.shape[0],1))))
-        print(con_dist.shape)
-        con_dist[:,5] = np.sqrt((con_dist[:,0] - x)**2 + (con_dist[:,1]-y)**2)
-        np.savetxt(savepath+f"{number}.txt",con_dist)
-        break
-    
-    return
-
-imgpath = "../../14-9/videos 14-09/experimento 1/frames0/000.jpg"
-filepath = '../../14-9/videos 14-09/experimento 1/campo0/'
-savepath = '../../14-9/videos 14-09/experimento 1/campo0/'
-dist_al_centro(imgpath, filepath, savepath)
-
-#%%
-
 def encontrar_centro(img_path):
     img = tools.imread(img_path)
     width, height = img.shape
@@ -182,7 +155,7 @@ def encontrar_centro(img_path):
 
 
     
-    coords = [x, y]
+    coords = np.array([x+int(0.4*width), y + int(0.4*height)])
     print("coords",coords)
     
     plt.imshow(img, origin="upper")
@@ -190,35 +163,113 @@ def encontrar_centro(img_path):
     plt.show()
     return coords
 
+
 #%%
 
-ar = np.loadtxt('../../14-9/videos 14-09/experimento 1/campo0/000.txt')
-a = np.linspace(0, 800, 81)
-vel_mag = np.sqrt(ar[:,2]**2 + ar[:,3]**2)
-vel_mag_nuevo = []
-for i in range(1, len(a)):
-    filtro1 = vel_mag > a[i-1]
-    filtro2 = vel_mag < a[i]
-    filtro = filtro1 & filtro2
-    print(filtro, a[i])
-    vel_mag_nuevo.append(np.mean(vel_mag[filtro]))
+def dist_al_centro(imgpath, filepath, savepath):
+    
+    ordered_paths = sorted(listdir(filepath))
+    ordered_frames = sorted(listdir(imgpath))
+    
+    for index, file in enumerate(ordered_paths):
+        frame = ordered_frames[index]
+        x_centro, y_centro = encontrar_centro(imgpath+frame)
+        
+        con_dist = np.loadtxt(filepath+file)
+        x = con_dist[:,0]
+        y = con_dist[:,1]
+        u = con_dist[:,2]
+        v = con_dist[:,3]
+        
+        con_dist = np.hstack((con_dist, np.zeros((con_dist.shape[0],6))))
+        dist = np.sqrt((con_dist[:,0] - x_centro)**2 + (con_dist[:,1] - y_centro)**2)
+        vel_mag = np.sqrt(con_dist[:,2]**2 + con_dist[:,3]**2)
+        x_norm = x/dist
+        y_norm = y/dist
+        
+        con_dist[:,5] += dist
+        con_dist[:,6] += vel_mag
+        con_dist[:,7] += x
+        con_dist[:,8] += y
+        con_dist[:,9] += x_norm * u + y_norm * v
+        con_dist[:,10] += -y_norm * u + x_norm * v
+        
+        
+        index = index + 1
+        number = str(index).zfill(3)
+        print(savepath+f"{number}.txt")
+        np.savetxt(savepath+f"{number}.txt", con_dist)
+    
+    return
+
+#%%
+cantidad=72
+save_path = "../../14-9/videos 14-09/experimento 1/campo0/"
+winsize = 16
+searchsize = 16
+overlap=8
+fps = 72
+dt = 1/fps
+percentile = 15
+
+
+frames_a_campos(frames_path, save_path, winsize, searchsize, overlap, cantidad,dt, percentile)
+#%%
+imgpath = "../../14-9/videos 14-09/experimento 1/frames0/"
+filepath = "../../14-9/videos 14-09/experimento 1/campo0/"
+savepath = "../../14-9/videos 14-09/experimento 1/campo0/"
+dist_al_centro(imgpath, filepath, savepath)
+
+#%%
+
+path = "../../14-9/videos 14-09/experimento 1/campo0/"
+
+dists = np.array([])
+vel_mags = np.array([])
+vrs = np.array([])
+vtitas = np.array([])
+for index, file in enumerate(sorted(listdir(path))):
+    
+    x, y, u, v, mask, dist, vel_mag, xc, yc, vr, vtita = np.loadtxt(path+file).T
+    
+    dists = np.concatenate((dists, np.array(dist)))
+    vel_mags = np.concatenate((vel_mags, np.array(vel_mag)))
+    vrs = np.concatenate((vrs, vr))
+    vtitas = np.concatenate((vtitas, vtita))
     
 
-plt.plot(a[:-1], vel_mag_nuevo, '.b')
-plt.show()
+#%%
+
+
+
 
 
 #%%
-tools.display_vector_field(
-    '../../14-9/videos 14-09/experimento 1/campo0/mean.txt',
-    scaling_factor=96.52,
-    scale=6000, # scale defines here the arrow length
-    width=0.0015, # width is the thickness of the arrow
-    on_img=True, # overlay on the image
-    image_name="../../14-9/videos 14-09/experimento 1/frames0/000.jpg",
-    window_size=winsize
-)
 
+plt.figure(figsize=(13,8))
+a = np.linspace(0, 450, 46*2)
+vel_mag_nuevo = []
+vel_r_nuevo = []
+vel_tita_nuevo = []
+for i in range(1, len(a)):
+    filtro1 = dists > a[i-1]
+    filtro2 = dists < a[i]
+    filtro = filtro1 & filtro2 
+    filtro = filtro.reshape(vel_mags.shape)
+    vel_mag_nuevo.append(np.nanmean(vel_mags[filtro]))
+    vel_r_nuevo.append(np.nanmean(vrs[filtro]))
+    vel_tita_nuevo.append(np.nanmean(vtitas[filtro]))
+    
+#plt.plot(a[:-1], vel_mag_nuevo, '-r', linewidth=2)
+#plt.plot(a[:-1], vel_r_nuevo, color='black', linewidth=2)
+plt.plot(-1*np.array(vel_tita_nuevo[30:350]), '.b', linewidth=2)
+plt.plot(np.array(vel_r_nuevo)[30:350], '.r')
+plt.show()
+#%%
 
-
+fig, ax = plt.subplots(1, figsize=(13,8))
+ax.plot(a[:-1], np.array(vel_tita_nuevo)/72, '-r', linewidth=2)
+ax.set_xlim([0, 350])
+ax.set_xlabel("Distancia al vórtice [px]")
+ax.set_ylabel("Velocidad en tita [px/s]")
 
