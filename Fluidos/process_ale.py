@@ -26,9 +26,7 @@ def extraer_frames(video_path, frames_path, n_frames):
         count += 1
 
 #%%
-video_path = "fluidos dia 1/vel_hiperlenta_70frames.avi"
-frames_path = "fluidos dia 1//frames0/"
-extraer_frames(video_path, frames_path, 100)
+
 
 #%%
 
@@ -133,28 +131,8 @@ def mean_vector_field(filepath):
 #%%
 
 def encontrar_centro(img_path):
-    img = tools.imread(img_path)
-    width, height = img.shape
-    img = img[int(0.4*width):int(0.6*width),int(0.4*height):int(0.6*height)]
     
-    filtro = img[:,:] > 100
-    filtro = filtro.reshape(img.shape)
-    img[filtro] = 1
-    img[~filtro] = 0
-    
-    # print(img==1, (img==1).shape)
-    # print("where", np.mean(np.where(img==1)[0]), np.mean(np.where(img==1)[1]))
-    x , y = np.mean(np.where(img==1)[1]), np.mean(np.where(img==1)[0])
-
-
-    
-    coords = np.array([x+int(0.4*width), y + int(0.4*height)])
-    print("coords",coords)
-    
-    plt.imshow(img, origin="upper")
-    plt.plot(x, y, "ro")
-    plt.show()
-    return coords
+    return 
 
 
 
@@ -225,6 +203,27 @@ def bur(x, c, b):
 def bur_vr(r, c, nu):
     vr = -2*nu*r/c**2
     return vr
+
+#%%
+
+def calcular_rotor(data):
+    x, y, u, v = data.T
+    
+    rotorX = np.zeros(len(y))
+    rotorY = np.zeros(len(y))
+    
+    dx = x[1] - x[0]
+    dy = dx
+    
+    for i in range(1, len(y) - 1):
+        rotorX[i] = (v[i+1] - v[i-1])/(2*dx)
+        rotorY[i] = (u[i+1] - u[i-1])/(2*dy)
+    
+    mag_rotor = np.sqrt(rotorX**2 + rotorY**2)
+    indice_max_rot = np.where(mag_rotor == max(mag_rotor))
+    
+    
+    return [x[indice_max_rot], y[indice_max_rot]]
 
 #%%
 cantidad=72
@@ -327,4 +326,23 @@ ax.plot(a[:-1], np.array(vel_tita_nuevo)/72, '-r', linewidth=2)
 ax.set_xlim([0, 350])
 ax.set_xlabel("Distancia al vórtice [px]")
 ax.set_ylabel("Velocidad en tita [px/s]")
+#%%
+
+frames_path = "../../28-09/Glicerina_36/vaso_10cm/glitter_led/"
+save_path = frames_path+"campos/"
+frames_a_campos(frames_path, save_path)
+
+#%%
+data = np.loadtxt(save_path+"001.txt")
+x_centro, y_centro = calcular_rotor(data[:,:4])
+print(x_centro, y_centro)
+x_centro = x_centro - 2*np.abs(x_centro - 672/2)
+y_centro = y_centro + 2*np.abs(y_centro - 672/2)
+
+fig, ax = plt.subplots(figsize=(11,11))
+ax.plot(x_centro, y_centro, 'ok')
+
+tools.display_vector_field(save_path+"020.txt", on_img=True,
+                           image_name=frames_path+"019.jpg",
+                           ax=ax, window_size=16)
 
