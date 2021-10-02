@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Sep 16 17:53:14 2021
-
-@author: dina
-"""
-
 from openpiv.piv import simple_piv
 from openpiv import tools, pyprocess
 import matplotlib.pyplot as plt
@@ -13,6 +5,7 @@ import numpy as np
 import matplotlib.patches as patches
 import cv2
 from os import listdir
+
 
 #%%
 
@@ -33,8 +26,8 @@ def extraer_frames(video_path, frames_path, n_frames):
         count += 1
 
 #%%
-video_path = "../../14-9/videos 14-09/experimento 1/velocidad0.avi"
-frames_path = "../../14-9/videos 14-09/experimento 1/frames0/"
+video_path = "fluidos dia 1/vel_hiperlenta_70frames.avi"
+frames_path = "fluidos dia 1//frames0/"
 extraer_frames(video_path, frames_path, 100)
 
 #%%
@@ -149,8 +142,8 @@ def encontrar_centro(img_path):
     img[filtro] = 1
     img[~filtro] = 0
     
-    print(img==1, (img==1).shape)
-    print("where", np.mean(np.where(img==1)[0]), np.mean(np.where(img==1)[1]))
+    # print(img==1, (img==1).shape)
+    # print("where", np.mean(np.where(img==1)[0]), np.mean(np.where(img==1)[1]))
     x , y = np.mean(np.where(img==1)[1]), np.mean(np.where(img==1)[0])
 
 
@@ -162,6 +155,8 @@ def encontrar_centro(img_path):
     plt.plot(x, y, "ro")
     plt.show()
     return coords
+
+
 
 
 #%%
@@ -181,33 +176,62 @@ def dist_al_centro(imgpath, filepath, savepath):
         u = con_dist[:,2]
         v = con_dist[:,3]
         
-        con_dist = np.hstack((con_dist, np.zeros((con_dist.shape[0],6))))
-        dist = np.sqrt((con_dist[:,0] - x_centro)**2 + (con_dist[:,1] - y_centro)**2)
-        vel_mag = np.sqrt(con_dist[:,2]**2 + con_dist[:,3]**2)
-        x_norm = x/dist
-        y_norm = y/dist
+        con_dist = np.hstack((con_dist, np.zeros((con_dist.shape[0],7))))
+        dist = np.sqrt((x - x_centro)**2 + (y - y_centro)**2)
+        #vel_mag = np.sqrt(con_dist[:,2]**2 + con_dist[:,3]**2)
+        vel_mag =  np.sqrt(u**2 + v**2)
+        x_norm = (x-x_centro)/dist
+        y_norm = (y-y_centro)/dist
         
         con_dist[:,5] += dist
         con_dist[:,6] += vel_mag
         con_dist[:,7] += x
         con_dist[:,8] += y
-        con_dist[:,9] += x_norm * u + y_norm * v
-        con_dist[:,10] += -y_norm * u + x_norm * v
+        
+        con_dist[:,9] += (x-x_centro)*u/dist + (y-y_centro)*v/dist
+        con_dist[:,10]+= (x-x_centro)*v/dist - (y-y_centro)*u/dist
+        
+        vr = con_dist[:,9] 
+        vt = con_dist[:,10] 
+        con_dist[:, 11] += np.sqrt(vr**2 + vt**2)
+        #con_dist[:,9] += x_norm * u + y_norm * v
+        #con_dist[:,10] += -y_norm * u + x_norm * v
         
         
         index = index + 1
         number = str(index).zfill(3)
-        print(savepath+f"{number}.txt")
+        #print(savepath+f"{number}.txt")
         np.savetxt(savepath+f"{number}.txt", con_dist)
-    
     return
+
+
+#%%
+def ran(x,a,b):
+    y = []
+    for i in range(len(x)):
+        if x[i]<= a:
+            y.append(x[i]/a**2)
+        else:
+            y.append(1/x[i])
+            
+    return np.array(y)*b    
+
+def bur(x, c, b):
+    y  = np.zeros(len(x))
+    for i in range(len(x)):
+        y[i] += b*(1 - np.e**(-x[i]**2 /c**2)) /x[i]
+    return y
+
+def bur_vr(r, c, nu):
+    vr = -2*nu*r/c**2
+    return vr
 
 #%%
 cantidad=72
-save_path = "../../14-9/videos 14-09/experimento 1/campo0/"
+save_path = "fluidos dia 1//campo0/"
 winsize = 16
 searchsize = 16
-overlap=8
+overlap=8   
 fps = 72
 dt = 1/fps
 percentile = 15
@@ -215,57 +239,88 @@ percentile = 15
 
 frames_a_campos(frames_path, save_path, winsize, searchsize, overlap, cantidad,dt, percentile)
 #%%
-imgpath = "../../14-9/videos 14-09/experimento 1/frames0/"
-filepath = "../../14-9/videos 14-09/experimento 1/campo0/"
-savepath = "../../14-9/videos 14-09/experimento 1/campo0/"
+imgpath = "fluidos dia 1/frames0/"
+filepath = "fluidos dia 1/campo0/"
+savepath = "fluidos dia 1/campo0/"
 dist_al_centro(imgpath, filepath, savepath)
 
-#%%
+#%% Extracción de las distintas velocidades a partir de los txt
 
-path = "../../14-9/videos 14-09/experimento 1/campo0/"
+path = "fluidos dia 1/campo0/"
 
 dists = np.array([])
 vel_mags = np.array([])
 vrs = np.array([])
 vtitas = np.array([])
+vel_mag_rad = np.array([])
+
 for index, file in enumerate(sorted(listdir(path))):
     
-    x, y, u, v, mask, dist, vel_mag, xc, yc, vr, vtita = np.loadtxt(path+file).T
+    x, y, u, v, mask, dist, vel_mag, xc, yc, vr, vtita,vel_mag_r = np.loadtxt(path+file).T
     
     dists = np.concatenate((dists, np.array(dist)))
     vel_mags = np.concatenate((vel_mags, np.array(vel_mag)))
     vrs = np.concatenate((vrs, vr))
     vtitas = np.concatenate((vtitas, vtita))
-    
-
-#%%
+    vel_mag_rad =  np.concatenate((vel_mag_rad, vel_mag_r))
 
 
+#%% Caluclo de las velocidades promedios en anillos centrados en el vortice
 
-
-
-#%%
+import seaborn as sns
 
 plt.figure(figsize=(13,8))
 a = np.linspace(0, 450, 46*2)
 vel_mag_nuevo = []
 vel_r_nuevo = []
 vel_tita_nuevo = []
+vel_mag_rad_nuevo = []
+hists = []
+binn = []
 for i in range(1, len(a)):
     filtro1 = dists > a[i-1]
     filtro2 = dists < a[i]
     filtro = filtro1 & filtro2 
     filtro = filtro.reshape(vel_mags.shape)
-    vel_mag_nuevo.append(np.nanmean(vel_mags[filtro]))
-    vel_r_nuevo.append(np.nanmean(vrs[filtro]))
-    vel_tita_nuevo.append(np.nanmean(vtitas[filtro]))
-    
-#plt.plot(a[:-1], vel_mag_nuevo, '-r', linewidth=2)
-#plt.plot(a[:-1], vel_r_nuevo, color='black', linewidth=2)
-plt.plot(-1*np.array(vel_tita_nuevo[30:350]), '.b', linewidth=2)
-plt.plot(np.array(vel_r_nuevo)[30:350], '.r')
+    vel_mag_nuevo.append(np.nanmedian(vel_mags[filtro]))
+    vel_r_nuevo.append(np.nanmedian(vrs[filtro]))
+    vel_tita_nuevo.append(np.nanmedian(vtitas[filtro]))
+    vel_mag_rad_nuevo.append((np.nanmedian(vel_mag_rad[filtro])))
+    # plt.figure()
+    # hist = plt.hist(vtitas[filtro], bins = np.linspace(-600, 100, 50))
+    # hists.append(hist)
+    # binn.append(np.linspace(-600, 100, 50))
+    # plt.show()
+#%% Grafico de las velocidades en funcion de las distancias
+
+#plt.plot(a[:-1], np.array(vel_mag_nuevo), '--r', linewidth=2, label = 'modulo velocidad')
+#plt.plot(a[:-1], vel_mag_rad_nuevo, '.', color = 'darkgreen', linewidth = 2 ,markersize = 10,label = 'modulo calculado con vr y vo')
+
+plt.plot(a[:-1], np.abs(np.array(vel_r_nuevo))/72, '.k', linewidth=2, label  = 'velocidad radial')
+plt.plot(a[:-1],np.abs(np.array(vel_tita_nuevo))/72, '.b', linewidth=2, label = 'velocidad tita')
+plt.xlabel("Distancia al vórtice [px]")
+plt.ylabel("Velocidad [px/s]")
+plt.legend()
 plt.show()
-#%%
+#%% Grafico general de la velocidad en tita (sin promediar)
+
+plt.figure(figsize = (10, 8))
+#plt.plot(dists, np.abs(np.array(vrs)), '.k', linewidth=2, label  = 'velocidad radial')
+plt.plot(dists, np.abs(np.array(vtitas)), '.b', linewidth=2, label = 'velocidad tita')
+
+#%% Ajuste de la velocidad en tita por los dos modelos
+
+from scipy.optimize import curve_fit
+popt, pcov = curve_fit(ran, a[:-20], np.abs(vel_tita_nuevo[:-19]), p0 =[80,20000])
+#popt2, pcov2 = curve_fit(bur, a[:-1], vel_mag_nuevo, p0 =[80,20000])
+
+plt.figure(figsize = (10, 6))
+plt.plot(a[:-1], np.abs(vel_tita_nuevo), 'b-', linewidth=2, label = 'Datos')
+plt.plot(a[:-20], bur(a[:-20], *popt), color = 'lime',label = 'Burguers')
+plt.plot(a[:-20], ran(a[:-20], *popt), color = 'orangered',label = 'Rankine')
+plt.grid(alpha = 0.6)
+plt.legend()
+#%% Vel en tita una vez mas
 
 fig, ax = plt.subplots(1, figsize=(13,8))
 ax.plot(a[:-1], np.array(vel_tita_nuevo)/72, '-r', linewidth=2)
