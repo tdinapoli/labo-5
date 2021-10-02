@@ -9,33 +9,6 @@ from os import listdir
 path_campos = '28-09/Glicerina_36/vaso_10cm/glitter_led_v2/campos_px_16/'    
 
 
-data0 = 'PIVlab_0001.txt'
-
-data = np.loadtxt(path_campos+data0, delimiter = ',',skiprows = 3) # x, y, u, v, type
-
-x,y,u,v,type_ = data.T
-
-d = np.arange(0, 0.1, 0.005)
-vel_mag = np.sqrt(u**2 + v**2)
-
-# x_c = 0.0321
-# y_c = 0.041
-dist = np.sqrt((x-x_c)**2+ (y-y_c)**2)
-
-vel_mag_prom = []
-dist_prom = []
-
-for i in range(len(d)):
-    filtro1 = dist > d[i-1]
-    filtro2 = dist < d[i]
-    filtro = filtro1 & filtro2 
-    filtro = filtro.reshape(vel_mag.shape)
-    
-    vel_mag_prom.append(np.nanmean(vel_mag[filtro]))
-    dist_prom.append(np.nanmean(dist[filtro]))
-
-plt.plot(dist_prom, vel_mag_prom, '.')
-
 
 def calcular_dist(x,xc,y,yc):
     dist = np.sqrt((x-xc)**2 +(y-yc)**2)
@@ -83,27 +56,20 @@ def calcular_L_muchos(txt): #txt con data se queda con algunos puntos del "centr
         
     return vel_modulo, Ls, posx, posy
 
-vels, L, posx, posy = calcular_L_muchos(data)
-minv = np.where(vels == min(vels))
-minL = np.where(L ==min(L))
-print('velocidades ', posx[minv], posy[minv], '\n')
-print('L           ', posx[minL], posy[minL], '\n')
-#tools.display_vector_field(data)#, on_img = True, image_name = '28-09/Glicerina_36/vaso_10cm/glitter_led_v2/000.jpg')
+
 #%%
 
-posx_c = np.zeros(60)
-posy_c = np.zeros(60)
-xtotales = np.array([])
-ytotales = np.array([])
-utotales = np.array([])
-vtotales = np.array([])
-vrtoatles = np.array([])
-vtitatotales = np.array([])
-disttotales = np.array([])
+xtotales = []
+ytotales = []
+utotales = []
+vtotales = []
+vrtotales = []
+vtitatotales = []
+disttotales = []
 xctotales = []
 yctotales = []
 
-
+path_campos = "../../28-09/Glicerina_36/vaso_15cm/Med2/campos/"
 
 for i in range(59):
     nombre = 'PIVlab_'+ str(i+1).zfill(4)+'.txt'
@@ -111,56 +77,75 @@ for i in range(59):
     data = np.loadtxt(path, delimiter = ',',skiprows = 3) 
     
     x,y,u,v,type_ = data.T
+    print(v)
     
     
     vels, L, posx, posy = calcular_L_muchos(data)
     minv = np.where(vels == min(vels))
     minL = np.where(L ==min(L))
-    
-    posx_c[i] +=  posx[minL]
-    posy_c[i] +=  posy[minL]
-    
+
     # fig, ax = plt.subplots(1, figsize  = (10,8))
     # ax.quiver(x,y,u,v, scale =150)
     # ax.plot(posx[minv], posy[minv], 'r.')
     # ax.plot(posx[minL], posy[minL], 'b.')
     # plt.show()
     
-    xc = posx[minL]
-    yc = posy[minL]
+    xc = posx[minL][0]
+    yc = posy[minL][0]
     dist = np.sqrt((x-xc)**2 + (y-yc)**2)
     vr = (x-xc) *u/dist + (y-yc)*v/dist
     vt = (x-xc) *v/dist - (y-yc)*u/dist
     
-    xtotales = np.concatenate(xtotales, np.array(x))
-    ytotales = np.concatenate(ytotales, np.array(y))
-    utotales = np.concatenate(utotales, u) 
-    vtotales = np.concatenate(vtotales, v)
-    vrtoatles = np.cpmcatemate(vrtoatles, vr)
-    vtitatotales = np.concatenate(vtitatotales, vt)
-    disttotales = np.concatenate(disttotales, dist)
-    xctotales = np.concatenate(xctotales, [xc]*len(x))
-    yctotales = np.concatenate(yctotales, [yc]*len(y))
+
+    xtotales = xtotales+ x.tolist()
+    ytotales = ytotales+ y.tolist()
+    utotales = utotales+ u.tolist()
+    vtotales = vtotales+ v.tolist()
+    vrtotales = vrtotales + vr.tolist()
+    vtitatotales = vtitatotales + vt.tolist()
+    disttotales = disttotales + dist.tolist()
+    xctotales = xctotales + [xc] * len(x)
+    yctotales = yctotales + [yc] * len(x)
+    
     
 todo  =np.zeros((len(x)*59,9))
 todo[:,0] = xtotales
 todo[:,1] = ytotales
 todo[:,2] =  utotales
 todo[:,3] =  vtotales
-todo[:,4] = vrtoatles
+todo[:,4] = vrtotales
 todo[:,5] = vtitatotales
 todo[:,6] = disttotales
 todo[:,7] = xctotales
 todo[:,8] = yctotales
-np.savetxt('28-09/Glicerina_36/vaso_10cm/glitter_led_v2/todo_v2_10cm.txt', todo)
+np.savetxt('../../28-09/Glicerina_36/vaso_15cm/Med2/campos/todo_v2_15cm.txt', todo)
 
 #%%
 
+x, y, u, v, vr, vt, dist, xc, yc= np.loadtxt('../../28-09/Glicerina_36/vaso_10cm/glitter_led_v2/campos_px_16/todo_v2_10cm.txt').T
 
+#%%
+
+dists_plot = np.arange(0, 405, 5)
+vts_plot = []
+vrs_plot = []
+
+for i in range(1, len(dists_plot)):
+    dist_min = dists_plot[i-1]
+    dist_max = dists_plot[i]
+    filtro1 = dist > dist_min
+    filtro2 = dist < dist_max
+    filtro = filtro1 & filtro2
+    filtro = filtro.reshape(vt.shape)
+    
+    vts_plot.append(np.nanmean(vt[filtro]))
+    vrs_plot.append(np.nanmean(vr[filtro]))
+
+
+vts_plot = np.array(vts_plot)
+plt.plot(dists_plot[:-1], np.abs(vts_plot))
+#plt.plot(dists_plot[:-1], np.abs(vrs_plot))
 
 
 
 #%%
-plt.figure(figsize =(10,6))
-plt.plot(posx_c[:-1], posy_c[:-1], 'bo')
-plt.plot(posx_c[-1], posy_c[-1], 'ro')
