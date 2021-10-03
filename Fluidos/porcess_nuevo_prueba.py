@@ -5,9 +5,10 @@ import numpy as np
 import matplotlib.patches as patches
 import cv2
 from os import listdir
+from scipy.optimize import curve_fit
 
-path_campos = '28-09/Glicerina_36/vaso_10cm/glitter_led_v2/campos_px_16/'    
-
+#path_campos = '28-09/Glicerina_36/vaso_10cm/glitter_led_v2/campos_px_16/'    
+path_campos = "28-09/Glicerina_50/vaso_10cm/med1/campos/"
 
 
 def calcular_dist(x,xc,y,yc):
@@ -28,10 +29,10 @@ def calcular_L_muchos(txt): #txt con data se queda con algunos puntos del "centr
     x_c = 336
     y_c = 336
     
-    filtrox1 = (x > (x_c - 20*dx)) 
-    filtrox2 = (x < (x_c +20*dx))
-    filtroy1 = (y > (y_c - 20*dy))
-    filtroy2 =  (y < (y_c +20*dy))
+    filtrox1 = (x > (x_c - 15*dx)) 
+    filtrox2 = (x < (x_c +15*dx))
+    filtroy1 = (y > (y_c - 15*dy))
+    filtroy2 =  (y < (y_c +15*dy))
     
     x_rec = np.unique(x[filtrox1 & filtrox2])
     y_rec = np.unique(y[filtroy1 & filtroy2])
@@ -45,7 +46,7 @@ def calcular_L_muchos(txt): #txt con data se queda con algunos puntos del "centr
     for indexx,xc in enumerate(x_rec):
         for indexy, yc in enumerate(y_rec):
             dist, filtro = calcular_dist(x, xc, y, yc)
-            u_sum,v_sum =  np.sum(u[filtro]), np.sum(v[filtro])
+            u_sum,v_sum =  np.nansum(u[filtro]), np.nansum(v[filtro])
             vel_modulo[len(x_rec)*indexx + indexy] += u_sum**2 + v_sum**2
             L = calcular_L((x[filtro]-xc), (y[filtro]-yc), u[filtro], v[filtro])
             Ls[len(x_rec)*indexx + indexy] += np.mean(L)
@@ -56,7 +57,8 @@ def calcular_L_muchos(txt): #txt con data se queda con algunos puntos del "centr
         
     return vel_modulo, Ls, posx, posy
 
-
+data = np.loadtxt('28-09/Glicerina_36/vaso_15cm/Med2/campos/PIVlab_0001.txt', delimiter = ',',skiprows = 3) 
+calcular_L_muchos(data)
 #%%
 
 xtotales = []
@@ -69,7 +71,7 @@ disttotales = []
 xctotales = []
 yctotales = []
 
-path_campos = "../../28-09/Glicerina_36/vaso_15cm/Med2/campos/"
+path_campos = "28-09/Glicerina_36/vaso_10cm/glitter_led/campos/"
 
 for i in range(59):
     nombre = 'PIVlab_'+ str(i+1).zfill(4)+'.txt'
@@ -84,11 +86,11 @@ for i in range(59):
     minv = np.where(vels == min(vels))
     minL = np.where(L ==min(L))
 
-    # fig, ax = plt.subplots(1, figsize  = (10,8))
-    # ax.quiver(x,y,u,v, scale =150)
-    # ax.plot(posx[minv], posy[minv], 'r.')
-    # ax.plot(posx[minL], posy[minL], 'b.')
-    # plt.show()
+    fig, ax = plt.subplots(1, figsize  = (10,8))
+    ax.quiver(x,y,u,v, scale =150)
+    ax.plot(posx[minv], posy[minv], 'r.')
+    ax.plot(posx[minL], posy[minL], 'b.')
+    plt.show()
     
     xc = posx[minL][0]
     yc = posy[minL][0]
@@ -118,11 +120,11 @@ todo[:,5] = vtitatotales
 todo[:,6] = disttotales
 todo[:,7] = xctotales
 todo[:,8] = yctotales
-np.savetxt('../../28-09/Glicerina_36/vaso_15cm/Med2/campos/todo_v2_15cm.txt', todo)
+np.savetxt('28-09/Glicerina_36/vaso_10cm/glitter_led/todo_g36_v1_10cm.txt', todo)
 
 #%%
 
-x, y, u, v, vr, vt, dist, xc, yc= np.loadtxt('../../28-09/Glicerina_36/vaso_10cm/glitter_led_v2/campos_px_16/todo_v2_10cm.txt').T
+x, y, u, v, vr, vt, dist, xc, yc= np.loadtxt('28-09/Glicerina_36/vaso_15cm/Med2/todo_v2_15cm.txt').T
 
 #%%
 
@@ -149,3 +151,39 @@ plt.plot(dists_plot[:-1], np.abs(vts_plot))
 
 
 #%%
+
+def ran(x,a,b):
+    y = []
+    for i in range(len(x)):
+        if x[i]<= a:
+            y.append(x[i]/a**2)
+        else:
+            y.append(1/x[i])
+            
+    return np.array(y)*b    
+
+def bur(x, c, b):
+    y  = np.zeros(len(x))
+    for i in range(len(x)):
+        y[i] += b*(1 - np.e**(-x[i]**2 /c**2)) /x[i]
+    return y
+
+def bur_vr(r, c, nu):
+    vr = -2*nu*r/c**2
+    return vr
+#%%
+popt, pcov = curve_fit(ran, dists_plot[1:-1], np.abs(vts_plot[1:]), p0 =[80,20000])
+popt2, pcov2 = curve_fit(bur, dists_plot[1:-1], np.abs(vts_plot[1:]), p0 =[80,20000])
+
+vts_plot = np.array(vts_plot)
+plt.figure(figsize = (10,6))
+plt.plot(dists_plot[:-1], np.abs(vts_plot),'.', label ='Datos')
+plt.plot(dists_plot[:-1], ran(dists_plot[:-1],*popt), label = 'Ajuste Rankie')
+plt.plot(dists_plot[:-1], bur(dists_plot[:-1],*popt2), label ='Ajuste Burguers')
+plt.legend()
+plt.grid(alpha = 0.7)
+
+
+
+
+
