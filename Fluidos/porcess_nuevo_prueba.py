@@ -8,7 +8,7 @@ from os import listdir
 from scipy.optimize import curve_fit
 
 #path_campos = '28-09/Glicerina_36/vaso_10cm/glitter_led_v2/campos_px_16/'    
-path_campos = "28-09/Glicerina_50/vaso_10cm/med1/campos/"
+path_campos = "28-09/Glicerina_50/vaso_10cm/med2/campos/"
 
 
 def calcular_dist(x,xc,y,yc):
@@ -57,8 +57,8 @@ def calcular_L_muchos(txt): #txt con data se queda con algunos puntos del "centr
         
     return vel_modulo, Ls, posx, posy
 
-data = np.loadtxt('28-09/Glicerina_36/vaso_15cm/Med2/campos/PIVlab_0001.txt', delimiter = ',',skiprows = 3) 
-calcular_L_muchos(data)
+#data = np.loadtxt('28-09/Glicerina_36/vaso_15cm/Med2/campos/PIVlab_0001.txt', delimiter = ',',skiprows = 3) 
+#calcular_L_muchos(data)
 #%%
 
 xtotales = []
@@ -70,8 +70,13 @@ vtitatotales = []
 disttotales = []
 xctotales = []
 yctotales = []
+path_campos = "28-09/Glicerina_36/vaso_15cm/Med2/campos_2/"
 
-path_campos = "28-09/Glicerina_36/vaso_10cm/glitter_led/campos/"
+#path_campos = "28-09/Glicerina_36/vaso_10cm/glitter_led/campos/"
+
+
+xce = np.zeros(59)
+yce = np.zeros(59)
 
 for i in range(59):
     nombre = 'PIVlab_'+ str(i+1).zfill(4)+'.txt'
@@ -86,10 +91,13 @@ for i in range(59):
     minv = np.where(vels == min(vels))
     minL = np.where(L ==min(L))
 
-    fig, ax = plt.subplots(1, figsize  = (10,8))
-    ax.quiver(x,y,u,v, scale =150)
-    ax.plot(posx[minv], posy[minv], 'r.')
-    ax.plot(posx[minL], posy[minL], 'b.')
+    xce[i] += posx[minL]
+    yce[i] += posy[minL]
+    
+    # fig, ax = plt.subplots(1, figsize  = (10,8))
+    # ax.quiver(x,y,u,v, scale =150)
+    # ax.plot(posx[minv], posy[minv], 'r.')
+    # ax.plot(posx[minL], posy[minL], 'b.')
     plt.show()
     
     xc = posx[minL][0]
@@ -110,18 +118,34 @@ for i in range(59):
     yctotales = yctotales + [yc] * len(x)
     
     
-todo  =np.zeros((len(x)*59,9))
-todo[:,0] = xtotales
-todo[:,1] = ytotales
-todo[:,2] =  utotales
-todo[:,3] =  vtotales
-todo[:,4] = vrtotales
-todo[:,5] = vtitatotales
-todo[:,6] = disttotales
-todo[:,7] = xctotales
-todo[:,8] = yctotales
-np.savetxt('28-09/Glicerina_36/vaso_10cm/glitter_led/todo_g36_v1_10cm.txt', todo)
+# todo  =np.zeros((len(x)*59,9))
+# todo[:,0] = xtotales
+# todo[:,1] = ytotales
+# todo[:,2] =  utotales
+# todo[:,3] =  vtotales
+# todo[:,4] = vrtotales
+# todo[:,5] = vtitatotales
+# todo[:,6] = disttotales
+# todo[:,7] = xctotales
+# todo[:,8] = yctotales
+# np.savetxt('28-09/Glicerina_36/vaso_15cm/Med2/campos_2/todo_g36_v2_15cm.txt', todo)
+#%%
+fig, (ax1,ax2) = plt.subplots(2, 1, figsize= (10,6), sharex = True)
+fig.suptitle('Posición del centro')
 
+ax1.plot(xce, 'k.')
+ax1.set_title('Variación de la posición del centro en x')
+ax1.set_ylabel('Posición [px]')
+#ax1.set_xlabel('frame')
+ax1.grid(0.7)
+
+ax2.plot(yce, 'k.')
+ax2.set_title('Variación de la posición del centro en y')
+ax2.set_ylabel('Posición [px]')
+ax2.set_xlabel('frame')
+ax2.grid(0.7)
+
+plt.savefig('pos_centro2.pdf')
 #%%
 
 x, y, u, v, vr, vt, dist, xc, yc= np.loadtxt('28-09/Glicerina_36/vaso_15cm/Med2/todo_v2_15cm.txt').T
