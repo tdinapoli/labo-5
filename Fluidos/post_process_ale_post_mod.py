@@ -78,7 +78,8 @@ def analisador(glicerina, vaso, velocidad, calibracion_pos = 1, calibracion_vel 
     
     vts_plot = np.array(vts_plot)
     plt.figure(figsize = (10,6))
-    plt.plot(dists[:-1], np.abs(vtitas),'.', label ='Datos')
+    plt.plot(dists[:-1], np.abs(vtitas), '.', label ='Datos')
+    #plt.errorbar(dists[:-1], np.abs(vtitas), yerr=0.00012/0.1388, xerr = 0.00012,fmt = '.', label ='Datos')
     plt.plot(dists[:-1], ran(dists[:-1],*popt), label = 'Ajuste Rankie')
     plt.plot(dists[:-1], bur(dists[:-1],*popt2), label ='Ajuste Burguers')
     plt.plot(dists[:-1], np.abs(np.array(vrs)),'--k', label ='vr')
@@ -101,7 +102,7 @@ def analisador(glicerina, vaso, velocidad, calibracion_pos = 1, calibracion_vel 
         ax[1].set_title('pos y')
     else:
         pass
-    return vts_plot,popt, popt2, calibracion_pos, calibracion_vel
+    return vtitas,popt, popt2, calibracion_pos, calibracion_vel
 
 #%%    
 
@@ -110,14 +111,14 @@ def analisador(glicerina, vaso, velocidad, calibracion_pos = 1, calibracion_vel 
 
 # g 36 vaso 15cm v2 cal_p = 0.00015 pos, cal_v = 0.0105 vel
 
-# g 50 vaso 10cm v1 cal_p = 0.00012 pos, cal_v = 0.00895 vel
-# g 50 vaso 10cm v2 cal_p = 0.00012 pos, cal_v = 0.00895 vel
+# g 50 vaso 10cm v1 cal_p = 0.00012 pos, cal_v = 0.00372 vel
+# g 50 vaso 10cm v2 cal_p = 0.00012 pos, cal_v = 0.00372 vel
 # g 50 vaso 10cm v3 cal_p = 0.00012 pos, cal_v = 0.0087 vel
 
 # g 50 vaso 15cm v2 cal_p = 0.00015 pos, cal_v = 0.01084 vel
 # g 50 vaso 15cm v3 cal_p = 0.00015 pos, cal_v = 0.01084 vel
 
-analisador('50', '15cm', 'v2', 0.00012, 0.000895)
+analisador('50', '10cm', 'v2', 0.00012, 0.00372)
 #%%
 
 vt_g50 ,popt_g50, popt2_g50, cal_pos_g50, cal_vel_g50 = analisador('50', '10cm', 'v2', 0.00012, 0.00895)
@@ -126,26 +127,28 @@ vt_g36 ,popt_g36, popt2_g36, cal_pos_g36, cal_vel_g36  = analisador('36', '10cm'
 #%%
 
 dists_plot = np.arange(0, 405, 5) * cal_pos_g50
-plt.plot(dists_plot[:-1], np.abs(vt_g50),'.', label ='Datos G50')
-plt.plot(dists_plot[:-1], ran(dists_plot[:-1],*popt_g50), label = 'Ajuste Rankie')
-plt.plot(dists_plot[:-1], bur(dists_plot[:-1],*popt2_g50), label ='Ajuste Burguers')
+plt.plot(dists_plot[:-1]*100, np.abs(vt_g50)*100,'.', label ='Datos G50')
+plt.plot(dists_plot[:-1]*100, ran(dists_plot[:-1],*popt_g50)*100, label = 'Ajuste Rankine')
+plt.plot(dists_plot[:-1]*100, bur(dists_plot[:-1],*popt2_g50)*100, label ='Ajuste Burguers')
 
-plt.plot(dists_plot[:-1], np.abs(vt_g36),'.', label ='Datos G36')
-plt.plot(dists_plot[:-1], ran(dists_plot[:-1],*popt_g36), label = 'Ajuste Rankie')
-plt.plot(dists_plot[:-1], bur(dists_plot[:-1],*popt2_g36), label ='Ajuste Burguers')
+dists_plot = np.arange(0, 405, 5) * cal_pos_g36
+plt.plot(dists_plot[:-1]*100, np.abs(vt_g36)*100,'.', label ='Datos G36')
+plt.plot(dists_plot[:-1]*100, ran(dists_plot[:-1],*popt_g36)*100, label = 'Ajuste Rankine')
+plt.plot(dists_plot[:-1]*100, bur(dists_plot[:-1],*popt2_g36)*100, label ='Ajuste Burguers')
 plt.xlabel('Distancia [cm]')
 plt.ylabel('Velocidad [cm/s]')
 plt.grid(0.7)
 plt.legend()
+plt.savefig('comparacion_g_v10cm.pdf')
 
 #%%
-vt_v1 ,popt_v1, popt2_v1, cal_pos_v1, cal_vel_v1 = analisador('50', '10cm', 'v1', 0.00012*100, 0.00895*100)
+#vt_v1 ,popt_v1, popt2_v1, cal_pos_v1, cal_vel_v1 = analisador('50', '10cm', 'v1', 0.00012*100, 0.00895*100)
 vt_v2 ,popt_v2, popt2_v2, cal_pos_v2, cal_vel_v2  = analisador('50', '10cm', 'v2', 0.00012*100, 0.00895*100)
 vt_v3 ,popt_v3, popt2_v3, cal_pos_v3, cal_vel_v3  = analisador('50', '10cm', 'v3', 0.00012*100, 0.0087*100)
 
 #%%
 dists_plot = np.arange(0, 405, 5)
-plt.plot(dists_plot[:-1]*cal_pos_v1, np.abs(vt_v1),'.', label ='Datos v1')
+#plt.plot(dists_plot[:-1]*cal_pos_v1, np.abs(vt_v1),'.', label ='Datos v1')
 # plt.plot(dists_plot[:-1]*cal_pos_v1*100, ran(dists_plot[:-1],*popt_v1)*cal_vel_v1, label = 'Ajuste Rankie')
 # plt.plot(dists_plot[:-1]*cal_pos_v1*100, bur(dists_plot[:-1],*popt2_v1)*cal_vel_v1, label ='Ajuste Burguers')
 
@@ -162,3 +165,4 @@ plt.xlabel('Distancia [cm]')
 plt.ylabel('Velocidad [cm/s]')
 plt.grid(0.7)
 plt.legend()
+plt.savefig('cpomaracion_dist_vel.pdf')
