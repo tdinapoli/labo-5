@@ -57,6 +57,10 @@ plt.figure()
 for i in rangos:
     plt.plot(i, val_med(i,y),'ok')
 plt.show()
+#%% Simulación 
+
+paso_medio = 2.163963918936407e-09
+
 
 #%% Atrapada
 
@@ -73,14 +77,14 @@ dif_brow = np.arange(0, 2)
 
 for i in lista:
     tp, xp, yp = np.loadtxt('Data/atrapada_2/atrapada_' + str(i) + '.txt', skiprows = 2).T #p = parcial
-    t_atr.append(tp-tp[0])
-    x_atr.append(xp-xp[0])
-    y_atr.append(yp-yp[0])
+    t_atr.append(tp)
+    x_atr.append(xp)
+    y_atr.append(yp)
     for j in dif_brow:
         tp, xp, yp = np.loadtxt('Data/atrapada_2/brow' + str(j) + '_' + str(i) + '.txt', skiprows = 2).T #p = parcial
-        t_brow.append(tp-tp[0])
-        x_brow.append(xp-xp[0])
-        y_brow.append(yp-yp[0])
+        t_brow.append(tp)
+        x_brow.append(xp)
+        y_brow.append(yp)
 
 plt.figure()
 for i in range(len(x_atr)):
