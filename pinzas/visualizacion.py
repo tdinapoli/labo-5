@@ -143,10 +143,30 @@ ax2.set_xlim([-2e-7, 2e-7])
 plt.legend()
 plt.show()
     
+#%%
 
+#MSD
 
+MSDS = []
 
-
-
+for trayectoria in range(len(X)):
+    if len(X[trayectoria]) == 150:
+        x = X[trayectoria]
+        y = Y[trayectoria]
+        r = np.sqrt(x**2 + y**2)
+        N = len(x)
+        msd = np.zeros(N)
+        
+        for retraso in range(N):
+            for i in range(N - retraso - 1):
+                msd[retraso] += (r[i+retraso] - r[i])**2
+            msd[retraso] = msd[retraso] / (N - (retraso + 1))
+        
+        MSDS.append(msd[:-1])
+        plt.plot(np.arange(N), msd)
+MSDS = np.array(MSDS)
+plt.plot(np.arange(N-1),np.nanmean(MSDS, axis=0), color="k", linewidth=2)
+plt.ylim(0, 1e-15)
+plt.show()
 
 
