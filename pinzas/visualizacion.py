@@ -56,16 +56,19 @@ plt.show()
 
 #25 trayectorias de partículas
 
-fix, axs = plt.subplots(5,5, figsize=(10,10))
+fix, axs = plt.subplots(5,5, figsize=(10,10), sharex=True, sharey=True)
 
 cuenta = 0
+filtro = len(X) == 150
+X_tray = X[filtro]
+Y_tray = Y[filtro]
 for ii in range(5):
     for jj in range(5):
         ax = axs[ii,jj]
         ax.set_xticks([])
         ax.set_yticks([])
-        x = X[cuenta]
-        y = Y[cuenta]
+        x = X_tray[cuenta]
+        y = Y_tray[cuenta]
         ax.plot(x[0], y[0], 'ok')
         ax.plot(x, y)
         cuenta += 1
@@ -136,8 +139,7 @@ for paso in pasos:
                                  label=str(paso), linewidth=2)
     ny, binsy, patchy = ax2.hist(y_paso, histtype="step", bins=50, density=False,
                                  label=str(paso), linewidth=2)
-    if paso == 30:
-        break
+
 ax1.set_xlim([-2e-7, 2e-7])
 ax2.set_xlim([-2e-7, 2e-7])
 plt.legend()
@@ -146,27 +148,8 @@ plt.show()
 #%%
 
 #MSD
-
-MSDS = []
-
-for trayectoria in range(len(X)):
-    if len(X[trayectoria]) == 150:
-        x = X[trayectoria]
-        y = Y[trayectoria]
-        r = np.sqrt(x**2 + y**2)
-        N = len(x)
-        msd = np.zeros(N)
-        
-        for retraso in range(N):
-            for i in range(N - retraso - 1):
-                msd[retraso] += (r[i+retraso] - r[i])**2
-            msd[retraso] = msd[retraso] / (N - (retraso + 1))
-        
-        MSDS.append(msd[:-1])
-        plt.plot(np.arange(N), msd)
-MSDS = np.array(MSDS)
-plt.plot(np.arange(N-1),np.nanmean(MSDS, axis=0), color="k", linewidth=2)
-plt.ylim(0, 1e-15)
+X_msd = np.array(X)
+X_msd = X[len(X[:,])] 
 plt.show()
 
 

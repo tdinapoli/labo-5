@@ -7,6 +7,7 @@ Created on Sat Oct 16 17:45:57 2021
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from importar_datos import calc_msd, msd_retrasos
 
 reps = 218
 X = []
@@ -19,7 +20,7 @@ for _ in range(reps):
     
     for i in range(n_pasos):
         signo = np.random.random()
-        if signo < 0.5:
+        if signo < 0.6:
             x[i] += x[i-1] + np.random.random()*amp
             y[i] += y[i-1] + np.random.random()*amp
         else:
@@ -40,22 +41,6 @@ plt.xlim([0,15])
 plt.show()
 
 
-MSDS = []
-for trayectoria in range(len(X)):
-    x = X[trayectoria]
-    y = Y[trayectoria]
-    r = np.sqrt(x**2 + y**2)
-    N = len(x)
-    msd = np.zeros(N)
-    
-    for retraso in range(N):
-        for i in range(N - retraso - 1):
-            msd[retraso] += (r[i+retraso] - r[i])**2
-        msd[retraso] = msd[retraso] / (N - (retraso + 1))
-    
-    MSDS.append(msd[:-1])
-    plt.plot(np.arange(N), msd)
-MSDS = np.array(MSDS)
-plt.plot(np.arange(N-1),np.nanmean(MSDS, axis=0), color="k", linewidth=2)
-plt.ylim(0, 0.4e-13)
+msd = msd_retrasos(X)
+plt.plot(np.arange(150), msd)
 plt.show()

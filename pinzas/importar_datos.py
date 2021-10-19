@@ -88,3 +88,23 @@ def calc_modulos(x, y):
         x_tmp, y_tmp = x[i], y[i]
         modulos[i] += np.sqrt(x_tmp**2 + y_tmp**2)
     return modulos
+
+
+def calc_msd(retraso, x):
+	N = len(x)
+	msd = np.zeros(N-retraso)
+	for i in range(N-retraso):
+		msd[i] += (x[i+retraso] - x[i])**2 / (N - retraso - 1)
+	return np.mean(msd)
+
+def msd_retrasos(X):
+	n = len(X[0])
+	msd_por_retraso = np.zeros(n)	
+	for retraso in range(n):
+		msd_tmp = 0
+		for x in X:		
+			msd_tmp += calc_msd(retraso, x)
+		msd_tmp = msd_tmp / n
+		msd_por_retraso[retraso] += msd_tmp
+	return msd_por_retraso
+
