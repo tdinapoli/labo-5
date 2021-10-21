@@ -6,7 +6,7 @@ Created on Sat Oct 16 14:44:59 2021
 @author: dina
 """
 
-from importar_datos import importar, calc_diferencias, calc_modulos
+from importar_datos import importar, calc_diferencias, calc_modulos, calc_msd, msd_retrasos, calc_msd_vec, msd_retrasos_vec
 import matplotlib.pyplot as plt
 import numpy as np
 #%%
@@ -152,4 +152,33 @@ X_msd = np.array(X)
 X_msd = X[len(X[:,])] 
 plt.show()
 
+#%% Autocorrelacion
+plt.figure()
+autocorr = []
+for i in range(len(X)):
+    if len(X[i])== 150:
+        autocorr.append(np.correlate(X[i], X[i], mode = 'same')/np.correlate(X[i],X[i]))    
+        #plt.plot(np.correlate(X[i], X[i], mode = 'same')/np.correlate(X[i],X[i]))
+plt.plot(np.mean(autocorr, axis = 0), color = 'k', linewidth = 3)
 
+#%% Correlación Cruzada
+
+corr_cruzada = []
+for i in range(len(X)):
+    for j in range(len(X)):
+        if len(X[i]) == 150 and len(X[j])== 150:
+            corr_cruzada.append(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
+            #plt.plot(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
+    print(i)
+plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
+
+#%%
+
+X_150 = []
+Y_150 = []
+for i in range(len(X)):
+    if len(X[i]) == 150:
+        X_150.append(X[i])
+        Y_150.append(Y[i])
+
+msd = msd_retrasos_vec(X_150, Y_150)
