@@ -48,7 +48,7 @@ ax1.set_xlim([0,15])
 ax1.grid(alpha=0.5)
 ax2.grid(alpha=0.5)
 
-
+#plt.savefig('tray.pdf')
 plt.show()
     
 
@@ -157,8 +157,8 @@ plt.figure()
 autocorr = []
 for i in range(len(X)):
     if len(X[i])== 150:
-        autocorr.append(np.correlate(X[i], X[i], mode = 'same')/np.correlate(X[i],X[i]))    
-        #plt.plot(np.correlate(X[i], X[i], mode = 'same')/np.correlate(X[i],X[i]))
+        autocorr.append(np.correlate(np.diff(X[i]), np.diff(X[i]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[i])))    
+        plt.plot(np.correlate(np.diff(X[i]), np.diff(X[i]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[i])))
 plt.plot(np.mean(autocorr, axis = 0), color = 'k', linewidth = 3)
 
 #%% Correlación Cruzada
@@ -167,12 +167,12 @@ corr_cruzada = []
 for i in range(len(X)):
     for j in range(len(X)):
         if len(X[i]) == 150 and len(X[j])== 150:
-            corr_cruzada.append(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
+            corr_cruzada.append(np.correlate(np.diff(X[i]), np.diff(X[j]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[j])))
             #plt.plot(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
     print(i)
 plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
 
-#%%
+#%% MSD vecotrial
 
 X_150 = []
 Y_150 = []
