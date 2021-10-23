@@ -168,11 +168,11 @@ for i in range(len(X)):
     for j in range(len(X)):
         if len(X[i]) == 150 and len(X[j])== 150:
             corr_cruzada.append(np.correlate(np.diff(X[i]), np.diff(X[j]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[j])))
-            #plt.plot(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
+            plt.plot(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
     print(i)
 plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
 
-#%% MSD vecotrial
+#%% Recorte solo datos 150 frames
 
 X_150 = []
 Y_150 = []
@@ -180,5 +180,59 @@ for i in range(len(X)):
     if len(X[i]) == 150:
         X_150.append(X[i])
         Y_150.append(Y[i])
+#%% MSD
+from scipy.optimize import curve_fit
+def lineal(x,a,b):
+    return x*a+b
+def cuad(x,a,b,c):
+    return a*x**2+b*x+c
+def exp(x,a):
+    a*np.exp(x)
 
-msd = msd_retrasos_vec(X_150, Y_150)
+rastro = np.arange(150)
+msd_tot = []
+plt.figure()
+for j in range(len(X_150)):
+    msd_tray = []
+    for i in rastro:
+        msd_tray.append(calc_msd_vec(i, X_150[j], Y_150[j]))
+    plt.plot(msd_tray, alpha = 0.6)
+    msd_tot.append(msd_tray)
+
+msd_prom = np.mean(msd_tot, axis = 0)
+
+popt, pcov = curve_fit(lineal, rastro[:-20], msd_prom[:-20])
+popt2, pcov2 = curve_fit(cuad, rastro[:-2], msd_prom[-2], p0 = [1e-20, 1e-25, 0])
+popt3, pcov3 = curve_fit(exp, rastro[:-5], msd_prom[-5], p0 = [1e-80])
+
+plt.plot(msd_prom, 'k-', linewidth = 3)
+plt.plot(rastro, lineal(rastro, *popt), 'r-', linewidth = 3)
+plt.plot(rastro, cuad(rastro, *popt2), 'b-', linewidth = 3)
+plt.plot(rastro, exp(rastro, 1e-80))
+#plt.plot(rastro, exp(rastro, *popt3), 'g-', linewidth = 3)
+#plt.xlim([0,140])
+plt.show()
+#msd = msd_retrasos_vec(X_150, Y_150)
+
+#%% Valor medio y varianza
+
+
+def val_med(N, x):
+    valores_medios = []
+    for i in range(len(x)-1):
+        valores_medios.append(x[i][N])
+    val_medi = np.mean(valores_medios)
+    std = np.std(valores_medios)
+    return val_medi, std
+
+rangos = np.arange(150)
+plt.figure()
+for i in rangos:
+    plt.plot(i, val_med(i,X_150)[0],'ok')
+plt.show()
+
+plt.figure()
+for i in rangos:
+    plt.plot(i, val_med(i,X_150)[1],'ok')
+    plt.plot(i, val_med(i,Y_150)[1],'ro')
+plt.show()
