@@ -145,32 +145,6 @@ ax2.set_xlim([-2e-7, 2e-7])
 plt.legend()
 plt.show()
     
-#%%
-
-#MSD
-X_msd = np.array(X)
-X_msd = X[len(X[:,])] 
-plt.show()
-
-#%% Autocorrelacion
-plt.figure()
-autocorr = []
-for i in range(len(X)):
-    if len(X[i])== 150:
-        autocorr.append(np.correlate(np.diff(X[i]), np.diff(X[i]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[i])))    
-        plt.plot(np.correlate(np.diff(X[i]), np.diff(X[i]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[i])))
-plt.plot(np.mean(autocorr, axis = 0), color = 'k', linewidth = 3)
-
-#%% Correlación Cruzada
-
-corr_cruzada = []
-for i in range(len(X)):
-    for j in range(len(X)):
-        if len(X[i]) == 150 and len(X[j])== 150:
-            corr_cruzada.append(np.correlate(np.diff(X[i]), np.diff(X[j]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[j])))
-            plt.plot(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
-    print(i)
-plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
 
 #%% Recorte solo datos 150 frames
 
@@ -180,6 +154,25 @@ for i in range(len(X)):
     if len(X[i]) == 150:
         X_150.append(X[i])
         Y_150.append(Y[i])
+#%% Autocorrelacion
+plt.figure()
+autocorr = []
+for i in range(len(X_150)):
+    autocorr.append(np.correlate(np.diff(X_150[i]), np.diff(X_150[i]), mode = 'same')/np.correlate(np.diff(X_150[i]),np.diff(X_150[i])))    
+    plt.plot(np.correlate(np.diff(X_150[i]), np.diff(X_150[i]), mode = 'same')/np.correlate(np.diff(X_150[i]),np.diff(X_150[i])))
+plt.plot(np.mean(autocorr, axis = 0), color = 'k', linewidth = 3)
+
+#%% Correlación Cruzada
+
+corr_cruzada = []
+for i in range(len(X_150)):
+    for j in range(len(X_150)):
+        corr_cruzada.append(np.correlate(np.diff(X_150[i]), np.diff(X_150[j]), mode = 'same')/np.correlate(np.diff(X_150[i]),np.diff(X_150[j])))
+        plt.plot(np.correlate(X_150[i], X_150[j], mode = 'same')/np.correlate(X_150[i],X_150[j]))
+    print(i)
+plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
+
+
 #%% MSD
 from scipy.optimize import curve_fit
 def lineal(x,a,b):
@@ -235,4 +228,35 @@ plt.figure()
 for i in rangos:
     plt.plot(i, val_med(i,X_150)[1],'ok')
     plt.plot(i, val_med(i,Y_150)[1],'ro')
+plt.show()
+#%%
+
+
+fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
+
+for i, t in enumerate(T):
+    x = X[i]
+    y = Y[i]
+    ax1.plot(t, x, alpha =0.6) 
+    ax2.plot(t, y, alpha = 0.6)
+
+fig.tight_layout()
+ax1.set_title("Desplazamiento en x")
+ax2.set_title("Desplazamiento en y")
+ax1.set_ylabel("Desplazamiento (m)")
+ax1.set_xlabel("Tiempo (s)")
+ax2.set_xlabel("Tiempo (s)")
+ax2.set_xlim([0,15])
+ax1.set_xlim([0,15])
+ax1.grid(alpha=0.5)
+ax2.grid(alpha=0.5)
+
+
+#fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
+
+for i in rangos:
+    ax1.errorbar(T[2][i], val_med(i, X_150)[0], yerr = val_med(i, X_150)[1],fmt = 'ok')
+
+    ax2.errorbar(T[2][i], val_med(i, Y_150)[0], yerr = val_med(i, Y_150)[1],fmt = 'ok')
+
 plt.show()
