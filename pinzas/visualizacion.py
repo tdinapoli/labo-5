@@ -237,8 +237,8 @@ fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
 for i, t in enumerate(T):
     x = X[i]
     y = Y[i]
-    ax1.plot(t, x, alpha =0.6) 
-    ax2.plot(t, y, alpha = 0.6)
+    ax1.plot(t, x, alpha =0.2) 
+    ax2.plot(t, y, alpha = 0.2)
 
 fig.tight_layout()
 ax1.set_title("Desplazamiento en x")
@@ -255,8 +255,8 @@ ax2.grid(alpha=0.5)
 #fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
 
 for i in rangos:
-    ax1.errorbar(T[2][i], val_med(i, X_150)[0], yerr = val_med(i, X_150)[1],fmt = 'ok')
+    ax1.errorbar(T[2][i], val_med(i, X_150)[0], yerr = val_med(i, X_150)[1],fmt = 'ok',alpha = 1)
 
-    ax2.errorbar(T[2][i], val_med(i, Y_150)[0], yerr = val_med(i, Y_150)[1],fmt = 'ok')
+    ax2.errorbar(T[2][i], val_med(i, Y_150)[0], yerr = val_med(i, Y_150)[1],fmt = 'ok', alpha = 1)
 
 plt.show()
