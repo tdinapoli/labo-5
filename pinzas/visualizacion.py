@@ -172,6 +172,17 @@ for i in range(len(X_150)):
     print(i)
 plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
 
+#%% Correlación cruzada parte 2
+
+plt.figure()
+corr_cruzada = []
+for i in range(len(X_150)):
+    for j in range(len(X_150)):
+        corr_cruzada.append(np.correlate(np.diff(X_150[i]) -np.mean(np.diff(X_150[i]))  , np.diff(Y_150[j]) -np.mean(np.diff(Y_150[j])), mode = 'same'))#/np.correlate(np.diff(X_150[i]),np.diff(X_150[j])))
+        plt.plot(np.correlate(np.diff(X_150[i]) -np.mean(np.diff(X_150[i]))  , np.diff(Y_150[j]) -np.mean(np.diff(Y_150[j])), mode = 'same'))
+    print(i)
+plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
+
 
 #%% MSD
 from scipy.optimize import curve_fit
