@@ -240,7 +240,7 @@ for i in rangos:
     plt.plot(i, val_med(i,X_150)[1],'ok')
     plt.plot(i, val_med(i,Y_150)[1],'ro')
 plt.show()
-#%%
+#%% Grafico de las trayectorias y sus valores medios
 
 
 fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
