@@ -13,7 +13,28 @@ import numpy as np
 
 #importo los datos
 
-T, X, Y , TA, XA, YA= importar()
+T_, X_, Y_ , TA, XA, YA= importar()
+
+X = []
+Y = []
+T = []
+for i in range(len(X_)):
+    if len(X_[i]) == 150:
+        X.append(X_[i])
+        Y.append(Y_[i])
+        T.append(T_[i])
+
+X = np.array(X)
+Y = np.array(Y)
+T = np.array(T)
+
+
+filtro_x = np.std(X, axis = 1) >= 1e-8
+filtro_y = np.std(Y, axis = 1) >= 1e-8
+
+X = X[filtro_x & filtro_y]
+Y = Y[filtro_x & filtro_y]
+T = T[filtro_x & filtro_y]
 
 Xdif, Ydif = calc_diferencias(X,Y)
 XAdif, YAdif = calc_diferencias(XA, YA)
@@ -25,17 +46,20 @@ Ydif = Ydif[np.abs(Ydif)<0.5e-7]
 modulos = calc_modulos(Xdif, Ydif)
 modulosA = calc_modulos(XAdif, YAdif)
 
+
 #%%
 
 #Desplazamiento vs tiempo tanto para x como para y para partículas no atrapadas
+
+
 
 fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
 
 for i, t in enumerate(T):
     x = X[i]
     y = Y[i]
-    ax1.plot(t, x)
-    ax2.plot(t, y)
+    ax1.plot(t, x, alpha =0.2) 
+    ax2.plot(t, y, alpha = 0.2)
 
 fig.tight_layout()
 ax1.set_title("Desplazamiento en x")
@@ -48,9 +72,30 @@ ax1.set_xlim([0,15])
 ax1.grid(alpha=0.5)
 ax2.grid(alpha=0.5)
 
+#%% Grafico de las desviaciones standar, hay que importar los datos sin el std
+
+fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
+
+long = np.arange(len(X))
+x = X[i]
+y = Y[i]
+ax1.plot(long, np.std(np.array(X), axis  = 1),'o')
+ax2.plot(long, np.std(np.array(Y), axis = 1),'o')
+
+fig.tight_layout()
+ax1.set_title("Desplazamiento en x")
+ax2.set_title("Desplazamiento en y")
+ax1.set_ylabel("Desplazamiento (m)")
+ax1.set_xlabel("Tiempo (s)")
+ax2.set_xlabel("Tiempo (s)")
+
+ax1.grid(alpha=0.5)
+ax2.grid(alpha=0.5)
+
 #plt.savefig('tray.pdf')
 plt.show()
-    
+        
+
 
 #%%
 
@@ -146,29 +191,21 @@ plt.legend()
 plt.show()
     
 
-#%% Recorte solo datos 150 frames
-
-X_150 = []
-Y_150 = []
-for i in range(len(X)):
-    if len(X[i]) == 150:
-        X_150.append(X[i])
-        Y_150.append(Y[i])
 #%% Autocorrelacion
 plt.figure()
 autocorr = []
-for i in range(len(X_150)):
-    autocorr.append(np.correlate(np.diff(X_150[i]), np.diff(X_150[i]), mode = 'same')/np.correlate(np.diff(X_150[i]),np.diff(X_150[i])))    
-    plt.plot(np.correlate(np.diff(X_150[i]), np.diff(X_150[i]), mode = 'same')/np.correlate(np.diff(X_150[i]),np.diff(X_150[i])))
+for i in range(len(X)):
+    autocorr.append(np.correlate(np.diff(X[i]), np.diff(X[i]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[i])))    
+    plt.plot(np.correlate(np.diff(X[i]), np.diff(X[i]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[i])))
 plt.plot(np.mean(autocorr, axis = 0), color = 'k', linewidth = 3)
 
 #%% Correlación Cruzada
 
 corr_cruzada = []
-for i in range(len(X_150)):
-    for j in range(len(X_150)):
-        corr_cruzada.append(np.correlate(np.diff(X_150[i]), np.diff(X_150[j]), mode = 'same')/np.correlate(np.diff(X_150[i]),np.diff(X_150[j])))
-        plt.plot(np.correlate(X_150[i], X_150[j], mode = 'same')/np.correlate(X_150[i],X_150[j]))
+for i in range(len(X)):
+    for j in range(len(X)):
+        corr_cruzada.append(np.correlate(np.diff(X[i]), np.diff(X[j]), mode = 'same')/np.correlate(np.diff(X[i]),np.diff(X[j])))
+        plt.plot(np.correlate(X[i], X[j], mode = 'same')/np.correlate(X[i],X[j]))
     print(i)
 plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
 
@@ -176,10 +213,10 @@ plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
 
 plt.figure()
 corr_cruzada = []
-for i in range(len(X_150)):
-    for j in range(len(X_150)):
-        corr_cruzada.append(np.correlate(np.diff(X_150[i]) -np.mean(np.diff(X_150[i]))  , np.diff(Y_150[j]) -np.mean(np.diff(Y_150[j])), mode = 'same'))#/np.correlate(np.diff(X_150[i]),np.diff(X_150[j])))
-        plt.plot(np.correlate(np.diff(X_150[i]) -np.mean(np.diff(X_150[i]))  , np.diff(Y_150[j]) -np.mean(np.diff(Y_150[j])), mode = 'same'))
+for i in range(len(X)):
+    for j in range(len(X)):
+        corr_cruzada.append(np.correlate(np.diff(X[i]) -np.mean(np.diff(X[i]))  , np.diff(Y[j]) -np.mean(np.diff(Y[j])), mode = 'same'))#/np.correlate(np.diff(X_150[i]),np.diff(X_150[j])))
+        plt.plot(np.correlate(np.diff(X[i]) -np.mean(np.diff(X[i]))  , np.diff(Y[j]) -np.mean(np.diff(Y[j])), mode = 'same'))
     print(i)
 plt.plot(np.mean(corr_cruzada, axis = 0), color = 'k', linewidth = 3)
 
@@ -193,26 +230,26 @@ def cuad(x,a,b,c):
 def exp(x,a):
     a*np.exp(x)
 
-rastro = np.arange(150)
+retraso = np.arange(38)
 msd_tot = []
 plt.figure()
-for j in range(len(X_150)):
+for j in range(len(X)):
     msd_tray = []
-    for i in rastro:
-        msd_tray.append(calc_msd_vec(i, X_150[j], Y_150[j]))
+    for i in retraso:
+        msd_tray.append(calc_msd_vec(i, X[j], Y[j]))
     plt.plot(msd_tray, alpha = 0.6)
     msd_tot.append(msd_tray)
 
 msd_prom = np.mean(msd_tot, axis = 0)
 
-popt, pcov = curve_fit(lineal, rastro[:-20], msd_prom[:-20])
-popt2, pcov2 = curve_fit(cuad, rastro[:-2], msd_prom[-2], p0 = [1e-20, 1e-25, 0])
-popt3, pcov3 = curve_fit(exp, rastro[:-5], msd_prom[-5], p0 = [1e-80])
+popt, pcov = curve_fit(lineal, retraso[:-5], msd_prom[:-5])
+popt2, pcov2 = curve_fit(cuad, retraso[:-5], msd_prom[-5], p0 = [1e-20, 1e-25, 0])
+#popt3, pcov3 = curve_fit(exp, rastro[:-5], msd_prom[-5], p0 = [1e-80])
 
-plt.plot(msd_prom, 'k-', linewidth = 3)
-plt.plot(rastro, lineal(rastro, *popt), 'r-', linewidth = 3)
-plt.plot(rastro, cuad(rastro, *popt2), 'b-', linewidth = 3)
-plt.plot(rastro, exp(rastro, 1e-80))
+plt.plot(msd_prom[:-1], 'k-', linewidth = 3)
+#plt.plot(rastro, lineal(rastro, *popt), 'r-', linewidth = 3)
+#plt.plot(rastro, cuad(rastro, *popt2), 'b-', linewidth = 3)
+#plt.plot(rastro, exp(rastro, 1e-80))
 #plt.plot(rastro, exp(rastro, *popt3), 'g-', linewidth = 3)
 #plt.xlim([0,140])
 plt.show()
@@ -232,13 +269,13 @@ def val_med(N, x):
 rangos = np.arange(150)
 plt.figure()
 for i in rangos:
-    plt.plot(i, val_med(i,X_150)[0],'ok')
+    plt.plot(i, val_med(i,X)[0],'ok')
 plt.show()
 
 plt.figure()
 for i in rangos:
-    plt.plot(i, val_med(i,X_150)[1],'ok')
-    plt.plot(i, val_med(i,Y_150)[1],'ro')
+    plt.plot(i, val_med(i,X)[1],'ok')
+    plt.plot(i, val_med(i,Y)[1],'ro')
 plt.show()
 #%% Grafico de las trayectorias y sus valores medios
 
@@ -266,8 +303,8 @@ ax2.grid(alpha=0.5)
 #fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
 
 for i in rangos:
-    ax1.errorbar(T[2][i], val_med(i, X_150)[0], yerr = val_med(i, X_150)[1],fmt = 'ok',alpha = 1)
+    ax1.errorbar(T[2][i], val_med(i, X)[0], yerr = val_med(i, X)[1],fmt = 'ok',alpha = 1)
 
-    ax2.errorbar(T[2][i], val_med(i, Y_150)[0], yerr = val_med(i, Y_150)[1],fmt = 'ok', alpha = 1)
+    ax2.errorbar(T[2][i], val_med(i, Y)[0], yerr = val_med(i, Y)[1],fmt = 'ok', alpha = 1)
 
 plt.show()

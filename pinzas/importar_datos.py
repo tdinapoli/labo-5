@@ -111,8 +111,8 @@ def msd_retrasos(X):
 
 def calc_msd_vec(retraso, x, y):
     N = len(x)
-    msd = np.zeros(N-retraso)
-    for i in range(N-retraso):
+    msd = np.zeros(N-retraso-1)
+    for i in range(N-retraso-1):
         msd[i] += ((x[i+retraso] - x[i])**2 + (y[i+retraso] - y[i])**2) / (N - retraso - 1)
     return np.mean(msd)
 
