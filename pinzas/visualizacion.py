@@ -247,8 +247,8 @@ popt2, pcov2 = curve_fit(cuad, retraso[:-5], msd_prom[-5], p0 = [1e-20, 1e-25, 0
 #popt3, pcov3 = curve_fit(exp, rastro[:-5], msd_prom[-5], p0 = [1e-80])
 
 plt.plot(msd_prom[:-1], 'k-', linewidth = 3)
-#plt.plot(rastro, lineal(rastro, *popt), 'r-', linewidth = 3)
-#plt.plot(rastro, cuad(rastro, *popt2), 'b-', linewidth = 3)
+plt.plot(retraso, lineal(retraso, *popt), 'r-', linewidth = 3)
+plt.plot(retraso, cuad(retraso, *popt2), 'b-', linewidth = 3)
 #plt.plot(rastro, exp(rastro, 1e-80))
 #plt.plot(rastro, exp(rastro, *popt3), 'g-', linewidth = 3)
 #plt.xlim([0,140])
