@@ -6,7 +6,10 @@ Created on Sat Oct 16 14:44:59 2021
 @author: dina
 """
 
-from importar_datos import importar, calc_diferencias, calc_modulos, calc_msd, msd_retrasos, calc_msd_vec, msd_retrasos_vec
+from importar_datos import importar, calc_diferencias, calc_modulos, calc_msd, \
+                             msd_retrasos, calc_msd_vec, msd_retrasos_vec, chisq, \
+                                 rval, pvalor    
+
 import matplotlib.pyplot as plt
 import numpy as np
 #%%
@@ -58,8 +61,12 @@ fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
 for i, t in enumerate(T):
     x = X[i]
     y = Y[i]
-    ax1.plot(t, x, alpha =0.2) 
-    ax2.plot(t, y, alpha = 0.2)
+    ax1.plot(t, x, alpha =0.5) 
+    ax2.plot(t, y, alpha = 0.5)
+
+t_raiz = np.arange(150)
+ax1.plot(t_raiz, np.sqrt(t)*1e-7, 'r')
+ax2.plot(t_raiz, np.sqrt(t)*1e-7, 'r')
 
 fig.tight_layout()
 ax1.set_title("Desplazamiento en x")
@@ -104,42 +111,57 @@ plt.show()
 fix, axs = plt.subplots(5,5, figsize=(10,10), sharex=True, sharey=True)
 
 cuenta = 0
-filtro = len(X) == 150
-X_tray = X[filtro]
-Y_tray = Y[filtro]
 for ii in range(5):
     for jj in range(5):
         ax = axs[ii,jj]
-        ax.set_xticks([])
-        ax.set_yticks([])
-        x = X_tray[cuenta]
-        y = Y_tray[cuenta]
+        x = X[cuenta]
+        y = Y[cuenta]
         ax.plot(x[0], y[0], 'ok')
         ax.plot(x, y)
         cuenta += 1
 plt.show()
 
+fig, ax = plt.subplots(figsize=(10, 10))
+
+for ii in range(5):
+    for jj in range(5):
+        x = X[cuenta]
+        y = Y[cuenta]
+        offsetx = ii*3e-7
+        offsety = jj*3e-7
+        ax.plot(x + offsetx, y + offsety)
+        ax.plot(x[0] + offsetx, y[0] + offsety, 'ok')
+        ax.plot(x[-1] + offsetx, y[-1] + offsety, '*k', markersize=10)
+        cuenta += 1
+plt.show()
+
+
 #%%
 
 #Cuatro histogramas de la magnitud de los pasos en X y en Y para atrapadas y no atrapadas
 
-fig, axs = plt.subplots(2,2, figsize=(10,10))
-ax1, ax2 = axs[0]
-ax3, ax4 = axs[1]
+for i in range(len(X)):
 
+    Xdif = np.diff(X[i])
+    Ydif = np.diff(Y[i])
 
-ax1.hist(Xdif, bins=100)
-ax1.set_xlim([-0.2e-7,0.2e-7])
-
-ax2.hist(Ydif, bins=100)
-ax2.set_xlim([-0.2e-7,0.2e-7])
-
-ax3.hist(YAdif, bins=100)
-ax3.set_xlim([-0.1e-7,0.1e-7])
-
-ax4.hist(XAdif, bins=100)
-ax4.set_xlim([-0.1e-7,0.1e-7])
-plt.show()
+    fig, axs = plt.subplots(1,2, figsize=(10,5))
+    ax1, ax2 = axs#[0]
+    #ax3, ax4 = axs[1]
+    
+    print(i)
+    ax1.hist(Xdif, bins=20, density=False)
+    ax1.set_xlim([-0.2e-7,0.2e-7])
+    
+    ax2.hist(Ydif, bins=20, density=False)
+    ax2.set_xlim([-0.2e-7,0.2e-7])
+    
+    # ax3.hist(YAdif, bins=100, density=True)
+    # ax3.set_xlim([-0.1e-7,0.1e-7])
+    
+    # ax4.hist(XAdif, bins=100, density=True)
+    # ax4.set_xlim([-0.1e-7,0.1e-7])
+    plt.show()
 
 #%%
 
@@ -161,7 +183,7 @@ plt.show()
 #(Ver tésis página 10)
 
 
-pasos = [10, 15, 30, 60, 100, 150]
+pasos = [10, 60, 149]
 
 fig, (ax1, ax2) = plt.subplots(1,2, figsize=(12,5))
 fig.tight_layout()
@@ -174,16 +196,16 @@ for paso in pasos:
     for i, t in enumerate(T):
         x = X[i]
         y = Y[i]
-        
-        try:
-            x_paso.append(x[paso])
-            y_paso.append(y[paso])
-        except:
-            pass
-    nx, binsx, patchx = ax1.hist(x_paso, histtype="step", bins=50, density=False,
+        x_paso.append(x[paso])
+        y_paso.append(y[paso])
+        x_paso.append(x[paso])
+        y_paso.append(y[paso])
+
+    nx, binsx, patchx = ax1.hist(x_paso, histtype="step", bins=10, density=True,
                                  label=str(paso), linewidth=2)
-    ny, binsy, patchy = ax2.hist(y_paso, histtype="step", bins=50, density=False,
+    ny, binsy, patchy = ax2.hist(y_paso, histtype="step", bins=10, density=True,
                                  label=str(paso), linewidth=2)
+
 
 ax1.set_xlim([-2e-7, 2e-7])
 ax2.set_xlim([-2e-7, 2e-7])
@@ -230,6 +252,7 @@ def cuad(x,a,b,c):
 def exp(x,a):
     a*np.exp(x)
 
+
 retraso = np.arange(38)
 msd_tot = []
 plt.figure()
@@ -242,8 +265,8 @@ for j in range(len(X)):
 
 msd_prom = np.mean(msd_tot, axis = 0)
 
-popt, pcov = curve_fit(lineal, retraso[:-5], msd_prom[:-5])
-popt2, pcov2 = curve_fit(cuad, retraso[:-5], msd_prom[-5], p0 = [1e-20, 1e-25, 0])
+popt, pcov = curve_fit(lineal, retraso, msd_prom)
+popt2, pcov2 = curve_fit(cuad, retraso, msd_prom, p0 = [1e-28, 1e-19, 0])
 #popt3, pcov3 = curve_fit(exp, rastro[:-5], msd_prom[-5], p0 = [1e-80])
 
 plt.plot(msd_prom[:-1], 'k-', linewidth = 3)
@@ -308,3 +331,70 @@ for i in rangos:
     ax2.errorbar(T[2][i], val_med(i, Y)[0], yerr = val_med(i, Y)[1],fmt = 'ok', alpha = 1)
 
 plt.show()
+
+
+#%% MSD para x e y por separado
+
+
+
+retraso = np.arange(38)
+msd_tot = []
+plt.figure(figsize=(12,5))
+for j in range(len(X)):
+    msd_tray = []
+    for i in retraso:
+        msd_tray.append(calc_msd(i, X[j]))
+    plt.plot(msd_tray, alpha = 0.2)
+    msd_tot.append(msd_tray)
+
+msd_prom = np.mean(msd_tot, axis = 0)
+
+popt, pcov = curve_fit(lineal, retraso, msd_prom)
+popt2, pcov2 = curve_fit(cuad, retraso, msd_prom, p0 = [1e-28, 1e-19, 0])
+
+chix = chisq(msd_prom, cuad(retraso, *popt2), np.std(msd_tot, axis=0))
+rx, kx = rval(msd_prom, chix, 3)
+pvalx =  pvalor(chix, kx)
+
+plt.title("X")
+plt.ylim(0, 3e-17)
+plt.errorbar(retraso, msd_prom, yerr=np.std(msd_tot, axis=0),fmt='k-', linewidth = 3)
+plt.plot(retraso, lineal(retraso, *popt), 'r--', linewidth = 2)
+plt.plot(retraso, cuad(retraso, *popt2), 'b--', linewidth = 2)
+plt.show()
+
+retraso = np.arange(38)
+msd_tot = []
+plt.figure(figsize=(12,5))
+for j in range(len(Y)):
+    msd_tray = []
+    for i in retraso:
+        msd_tray.append(calc_msd(i, Y[j]))
+    plt.plot(msd_tray, alpha = 0.3)
+    msd_tot.append(msd_tray)
+
+msd_prom = np.mean(msd_tot, axis = 0)
+
+popt, pcov = curve_fit(lineal, retraso, msd_prom)
+popt2, pcov2 = curve_fit(cuad, retraso, msd_prom, p0 = [1e-28, 1e-19, 0])
+
+chiy = chisq(msd_prom, cuad(retraso, *popt2), np.std(msd_tot, axis=0))
+ry, ky = rval(msd_prom, chiy, 3)
+pvaly =  pvalor(chiy, ky)
+
+plt.title("MSD en Y para series de 150 datos")
+plt.ylim(0, 3e-17)
+#plt.plot(msd_prom, 'k-', linewidth = 3)
+plt.ylabel("MSD en Y")
+plt.xlabel("Retraso")
+plt.errorbar(retraso, msd_prom, yerr=np.std(msd_tot, axis=0),fmt='k-', linewidth = 3, alpha=1, zorder=0)
+plt.plot(retraso, lineal(retraso, *popt), 'r--', linewidth = 3)
+plt.plot(retraso, cuad(retraso, *popt2), '--', color="lime", linewidth = 3, alpha=1)
+plt.show()
+
+
+#%%
+
+
+
+

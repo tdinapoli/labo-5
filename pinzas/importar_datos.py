@@ -6,6 +6,8 @@ Created on Sat Oct 16 14:57:56 2021
 @author: dina
 """
 import numpy as np
+from scipy.stats import chi2
+
 
 def importar():
     data_num = np.arange(0,40)
@@ -98,15 +100,15 @@ def calc_msd(retraso, x):
 	return np.mean(msd)
 
 def msd_retrasos(X):
-	n = len(X[0])
-	msd_por_retraso = np.zeros(n)	
-	for retraso in range(n):
-		msd_tmp = 0
-		for x in X:		
-			msd_tmp += calc_msd(retraso, x)
-		msd_tmp = msd_tmp / n
-		msd_por_retraso[retraso] += msd_tmp
-	return msd_por_retraso
+    n = len(X[0])
+    msd_por_retraso = np.zeros(n)
+    for retraso in range(int(n/4)):
+        msd_tmp = 0
+        for x in X:		
+            msd_tmp += calc_msd(retraso, x)
+        msd_tmp = msd_tmp / n
+        msd_por_retraso[retraso] += msd_tmp
+    return msd_por_retraso
 
 
 def calc_msd_vec(retraso, x, y):
@@ -127,3 +129,17 @@ def msd_retrasos_vec(X, Y):
 		msd_tmp = msd_tmp / n
 		msd_por_retraso[retraso] += msd_tmp
 	return msd_por_retraso
+
+
+def chisq(ydata, ymodelo,sd):
+    chisq = sum(((ydata-ymodelo)/sd)**2)
+    return chisq
+    
+def rval( ydata, chi, gl):  #reduce chi square   gl = numero de parametros de la funcion es bueno q este cerca de 1
+    k=len(ydata)-1-gl
+    rval=chi/k   
+    return rval, k
+
+def pvalor(chi, k):         #integral de Ã±a distribucion de chisq es bueno q este cerca de 0
+    p  = 1- chi2.cdf(chi, k)
+    return p
