@@ -9,38 +9,52 @@ import numpy as np
 import matplotlib.pyplot as plt
 from importar_datos import calc_msd, msd_retrasos
 
-reps = 218
-X = []
-Y = []
-for _ in range(reps):
-    n_pasos = 150
-    x = np.zeros(150)
-    y = np.zeros(150)
-    amp = 2e-8
-    
-    for i in range(n_pasos):
-        signo = np.random.random()
-        if signo < 0.6:
-            x[i] += x[i-1] + np.random.random()*amp
-            y[i] += y[i-1] + np.random.random()*amp
-        else:
-            x[i] += x[i-1] - np.random.random()*amp
-            y[i] += y[i-1] - np.random.random()*amp
-    
-    X.append(x)
-    Y.append(y)
-
-plt.figure(figsize=(8,5))
-t = np.arange(0,150,1)/10
-for i in range(len(X)):
-    x = X[i]
-    y = Y[i]
-    plt.plot(t, x)
-    plt.plot(t,y)
-plt.xlim([0,15])
-plt.show()
+#%%
 
 
-msd = msd_retrasos(X)
-plt.plot(np.arange(150), msd)
-plt.show()
+def simular(reps=80, n_pasos=150, probx=0.5, proby=0.5, ampx=4e-9, ampy=4e-9):
+    X = []
+    Y = []
+    for _ in range(reps):
+        x = np.zeros(n_pasos)
+        y = np.zeros(n_pasos)
+        
+        for i in range(n_pasos):
+            signox = np.random.random()
+            signoy = np.random.random()
+            if signox < probx:
+                x[i] += x[i-1] + ampx
+            else:
+                x[i] += x[i-1] - ampx
+            if signoy < proby:
+                y[i] += y[i-1] + ampy
+            else:
+                y[i] += y[i-1] - ampy
+        
+        X.append(x)
+        Y.append(y)
+    X = np.array(X)
+    Y = np.array(Y)
+    return [X, Y]
+
+def simular2(reps=80, n_pasos=150, probx=0.5, proby=0.5, amp=6.38e-9):
+    X = []
+    Y = []
+    for _ in range(reps):
+        x = np.zeros(n_pasos)
+        y = np.zeros(n_pasos)
+        
+        for i in range(n_pasos):
+            tita = np.random.random()*np.pi * 2
+            
+            pasox = amp * np.cos(tita)
+            pasoy = amp * np.sin(tita)
+                        
+            x[i] += x[i-1] + pasox
+            y[i] += y[i-1] + pasoy
+
+        X.append(x)
+        Y.append(y)
+    X = np.array(X)
+    Y = np.array(Y)
+    return [X, Y]
