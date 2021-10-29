@@ -95,14 +95,20 @@ msd_y_prom_sim = np.mean(msd_tot_y_sim, axis=0)
 
 #Desplazamiento vs tiempo tanto para x como para y para partículas no atrapadas
 
+labels = {'fontname' : 'Times New Roman',
+          'fontsize' : 20}
+ticks = {'fontname' : 'Times New Roman',
+         'fontsize' : 15}
+legends = {'fontname' : 'Times New Roman',
+           'fontsize' : 10}
 
 
-fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(13,5))
+fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(10,5))
 
 cmap = plt.get_cmap("plasma")
 n_plots = len(T)
 colores = [cmap(i) for i in np.linspace(0.25, 0.75, n_plots)]
-np.random.shuffle(colores)
+#np.random.shuffle(colores)
 
 for i, color in enumerate(colores):
     t = T[i]
@@ -110,30 +116,33 @@ for i, color in enumerate(colores):
     y = Y[i]
     xsim = Xsim[i]
     ysim = Ysim[i]
-    ax1.plot(t, x, color=color, alpha=0.5) 
-    ax1.plot(t, xsim, color="red", alpha=0.5)
-    ax2.plot(t, ysim, color="red", alpha=0.5)
-    ax2.plot(t, y, color=color, alpha=0.5)
+    ax1.plot(t, x*1e9, '-', linewidth=5, color=color, alpha=((1-(i/len(colores))**0.95))) 
+    #ax1.plot(t, xsim, color="red", alpha=0.5)
+    #ax2.plot(t, ysim, color="red", alpha=0.5)
+    ax2.plot(t, y*1e9, '-', linewidth=5, color=color, alpha=((1- (i/(len(colores)))**0.95)))
 
 t_raiz = np.arange(150)
-ax1.plot(t_raiz, np.sqrt(t)*1e-7, '--k')
-ax1.plot(t_raiz, -np.sqrt(t)*1e-7, '--k')
-ax2.plot(t_raiz, -np.sqrt(t)*1e-7, '--k')
-ax2.plot(t_raiz, np.sqrt(t)*1e-7, '--k')
+# ax1.plot(t_raiz, np.sqrt(t)*1e-7, '--k')
+# ax1.plot(t_raiz, -np.sqrt(t)*1e-7, '--k')
+# ax2.plot(t_raiz, -np.sqrt(t)*1e-7, '--k')
+# ax2.plot(t_raiz, np.sqrt(t)*1e-7, '--k')
 
 
 fig.tight_layout()
-ax1.set_title("Desplazamiento en x")
-ax2.set_title("Desplazamiento en y")
-ax1.set_ylabel("Desplazamiento (m)")
-ax1.set_xlabel("Tiempo (s)")
-ax2.set_xlabel("Tiempo (s)")
-ax1.set_ylim([-3e-7, 3e-7])
+ax1.set_ylabel("Desplazamiento [nm]", **labels)
+ax1.set_xlabel("Tiempo [s]", **labels)
+ax2.set_xlabel("Tiempo [s]", **labels)
+ax1.set_ylim([-3e2, 3e2])
+ax1.tick_params(labelsize=15)
+ax2.tick_params(labelsize=15)
 
 ax2.set_xlim([0,15])
 ax1.set_xlim([0,15])
 ax1.grid(alpha=0.5)
 ax2.grid(alpha=0.5)
+plt.gcf().subplots_adjust(bottom=0.15, left=0.1)
+
+plt.show()
 
 #%% Grafico de las desviaciones standar, hay que importar los datos sin el std
 
