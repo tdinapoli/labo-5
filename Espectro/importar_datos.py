@@ -6,21 +6,21 @@ from scipy.signal import find_peaks as fp
 elementos = ['hi', 'me', 'kr', 'he', 'ne', 'ar', 'so']
 tipo  =  ['ns', 'ss']
 
-frecs_ns = []
+lon_ns = []
 int_ns = []
 
-frecs_ss = []
+lon_ss = []
 int_ss = []
 
 for i in elementos:
     for j in tipo:
         if j == 'ns':
             data =  np.loadtxt(open(i + '_' + j + '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
-            frecs_ns.append(data[:,0])
+            lon_ns.append(data[:,0])
             int_ns.append(data[:,1])
         else:
             data =  np.loadtxt(open(i + '_' + j + '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
-            frecs_ss.append(data[:,0])
+            lon_ss.append(data[:,0])
             int_ss.append(data[:,1])
 
 
@@ -37,18 +37,18 @@ so_lines = np.array([4455.23, 5889.950, 5895.924, 8194.824])*0.1
 
 teo_lines = [hi_lines, me_lines, kr_lines, he_lines, ne_lines, ar_lines, so_lines]
 
-frec_max = []
+lon_max = []
 int_max = []
 for i in range(len(elementos)):
     find_peks = fp(int_ns[i], height = 0.02)
-    frec_max.append(frecs_ns[i][find_peks[0]])
+    lon_max.append(lon_ns[i][find_peks[0]])
     int_max.append(int_ns[i][find_peks[0]])
 #%% Ploteo los resultados en 7 figuras distintas
 
 for i in range(len(elementos)):
     plt.figure()
-    plt.plot(frecs_ns[i], int_ns[i])
-    plt.plot(frec_max[i], int_max[i],'o')
+    plt.plot(lon_ns[i], int_ns[i])
+    plt.plot(lon_max[i], int_max[i],'o')
     for j in range(len(teo_lines[i])):
         plt.vlines(teo_lines[i][j], ymin = 0, ymax = 1,linestyle = 'dashed', color = 'black')
     plt.show()
