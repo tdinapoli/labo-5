@@ -74,25 +74,37 @@ plt.show()
 def moving_average(x, n):
     return np.convolve(x, np.ones(n), mode="same")/n
 
-# def moving_std(x, n):
-#     MA = moving_average(x)
-#     MSTD = []
-#     for mean in MA:
-#         MSTD.append(np.std(x[]))
+
+def moving_std(x, n):
+    MA = moving_average(x, n)
+    MSTD = []
+    for i, mean in enumerate(MA):
+        if i - n//2 < 0:
+            MSTD.append(np.std(x[0:i + n//2]))
+        elif i + n//2 > len(x):
+            MSTD.append(np.std(x[i - n//2: -1]))
+        else:
+            MSTD.append(np.std(x[i-n//2:i + n//2]))
+    return MSTD
 
 #%% Moving Average de la absorbancia para eliminar un poco el ruido
 MA_abs_s1 = []
 MA_abs_s2 = []
+MSTD_abs_s1 = []
+MSTD_abs_s2 = []
 for i in range(len(absorbancia_s1)):
     MA_abs_s1.append(moving_average(absorbancia_s1[i], 30))
     MA_abs_s2.append(moving_average(absorbancia_s2[i], 30))
+    MSTD_abs_s1.append(moving_std(absorbancia_s1[i], 30))
+    MSTD_abs_s2.append(moving_std(absorbancia_s2[i], 30))
 
 #%% Gráficos lindos de la absorbancia, tratando de copiar a merlen2009
 
 from matplotlib import rc
 
-colores = ["#03071e","#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"]
-
+#colores = ["#03071e","#370617","#6a040f","#9d0208","#d00000","#dc2f02","#e85d04","#f48c06","#faa307","#ffba08"]
+#colores = ["#f72585","#b5179e","#7209b7","#560bad","#480ca8","#3a0ca3","#3f37c9","#4361ee","#4895ef","#4cc9f0"]
+colores = ["#c29b92","#d29182","#da8267","#e37750","#ea6f3a","#f36828","#b45124","#773518","#3b180d","#010005"]
 
 labels = {"fontname":"Times New Roman", "fontsize":15}
 todo = {"family": "sans-serif", "sans-serif":["Times New Roman"]}
@@ -101,16 +113,22 @@ rc("font", **todo)
 fig, ax = plt.subplots(1, figsize=(6,10))
 
 for i, absorb in enumerate(MA_abs_s1):
-    color = colores[2*i]
+    color = colores[-i-1]
     ax.plot(lon_s1[i], absorb, color=color, label=laminado[i+1]+" s")
+    ax.fill_between(lon_s1[i], absorb + MSTD_abs_s1[i], absorb - MSTD_abs_s1[i],
+                    color=color, alpha=0.2, linewidth=0)
+    # ax.plot(lon_s1[i], absorb + MSTD_abs_s1[i], linestyle="solid", color=color)
+    # ax.plot(lon_s1[i], absorb - MSTD_abs_s1[i], linestyle="solid", color=color)
+    #break
     
 ax.set_yticks(np.arange(0, 0.55, 0.05))
 ax.set_ylim([0, 0.5])
 ax.grid(alpha=0.5)
 ax.set_xlabel("Longitud de onda [nm]", **labels)
 ax.set_ylabel("Absorbancia", **labels)
-ax.set_xlim([400, 800])
-ax.legend(fontsize=15)
+ax.set_xlim([400, 1000])
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles[::-1], labels[::-1], fontsize=15, loc="upper left", framealpha=1)
 ax.tick_params(labelsize=12)
 plt.savefig("../../imagenes_informe/espectro/absorbancias")
 plt.show()
