@@ -60,12 +60,12 @@ for j in lon:
         if lon_papel[0][i+1]>j and lon_papel[0][i]<j:
             #print(lon_papel[0][i])
             long_onda.append(int(lon_papel[0][i]))
-            inte.append(int_papel[4][i])
+            inte.append(int_papel[0][i])
             inte_lamp.append(int_lampara[i])
 #%%
-data_dic = dict(zip(long_onda,np.array(inte)/np.array(inte_lamp)))
+data_dic = dict(zip(long_onda,np.array(inte)))
 sdm     = ( colour.SpectralDistribution(data_dic)).normalise()
 XYZ = colour.sd_to_XYZ(sdm)
 RGB = colour.XYZ_to_sRGB(XYZ)
 plt.style.use({'figure.figsize': (5, 5)})
-plot_single_colour_swatch(ColourSwatch('Mediodía', RGB/np.max(RGB)),text_parameters={'size': 'x-large'});            
+plot_single_colour_swatch(ColourSwatch('Verde', RGB/np.max(RGB)),text_parameters={'size': 'x-large'});            
