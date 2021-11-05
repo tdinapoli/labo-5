@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks as fp 
 #%%
-data_lamapra = np.loadtxt(open('lampara_halogena_t_2100.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
+data_lamapra = np.loadtxt(open('data/dia 2/lampara_halogena_t_2100.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
 int_lampara = data_lamapra[:,1]
 lon_lampara = data_lamapra[:,0]
 
@@ -12,7 +12,7 @@ int_papel = []
 lon_papel = []
 
 for i in colores_celofan:
-    data =  np.loadtxt(open('f_'+i+ '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
+    data =  np.loadtxt(open('data/dia 2/f_'+i+ '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
     lon_papel.append(data[:,0])
     int_papel.append(data[:,1])
 
@@ -21,7 +21,7 @@ int_RGB = []
 lon_RGB = []
 
 for i in RGB:
-    data =  np.loadtxt(open('RGB_'+i+ '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
+    data =  np.loadtxt(open('data/dia 2/RGB_'+i+ '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
     lon_RGB.append(data[:,0])
     int_RGB.append(data[:,1])
 

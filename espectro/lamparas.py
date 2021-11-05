@@ -15,18 +15,18 @@ int_ss = []
 for i in elementos:
     for j in tipo:
         if j == 'ns':
-            data =  np.loadtxt(open(i + '_' + j + '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
+            data =  np.loadtxt(open("data/dia 1/"+i + '_' + j + '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
             lon_ns.append(data[:,0])
             int_ns.append(data[:,1])
         else:
-            data =  np.loadtxt(open(i + '_' + j + '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
+            data =  np.loadtxt(open("data/dia 1/"+i + '_' + j + '.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
             lon_ss.append(data[:,0])
             int_ss.append(data[:,1])
 
 
-#%% Cargo las lineas espectrales teoricas del NIST y caculo los picos de de cada uno de los datos y los appendeo a otro lista
+#%% Cargo las lineas espectrales teoricas del NIST
 
-hi_lines = [410.0174, 434.462, 486.128, 486.135, 656.272, 656.285]
+hi_lines = np.array([6562.8518, 6562.7110, 4861.3615, 6562.7248, 4861.2786, 4340.462])/10
 me_lines = np.array([2052.828, 2262.223, 2536.517, 2847.675, 2967.280, 3650.153, 3983.931, 4358.328, 5460.735, 5677.105, 6149.475, 7944.555])*0.1
 kr_lines = np.array([3718.02, 3778.046, 3783.095,4057.037, 4065.128, 4088.337, 4273.9694, 4292.923, 4355.477, 4739.002, 5870.9160, 8059.5048, 8104.3655,  8112.9012	, 8190.0566, 8263.2426, 8281.0522, 8298.1099, 8508.8728, 8776.7505, 8928.6934, 9293.82, 9577.52, 9751.7610, 9803.14])*0.1
 he_lines = np.array([3888.6456, 3888.6489, 4471.479, 5015.678, 5875.6148, 5875.6404, 5875.9663, 6678.1517, 7065.1771,7281.35 ])  *0.1
@@ -37,18 +37,26 @@ so_lines = np.array([4455.23, 5889.950, 5895.924, 8194.824])*0.1
 
 teo_lines = [hi_lines, me_lines, kr_lines, he_lines, ne_lines, ar_lines, so_lines]
 
+#%% Caculo los picos de de cada uno de los datos y los appendeo a otro lista
+
 lon_max = []
 int_max = []
 for i in range(len(elementos)):
     find_peks = fp(int_ns[i], height = 0.02)
     lon_max.append(lon_ns[i][find_peks[0]])
     int_max.append(int_ns[i][find_peks[0]])
+    
+
 #%% Ploteo los resultados en 7 figuras distintas
 
 for i in range(len(elementos)):
     plt.figure()
-    plt.plot(lon_ns[i], int_ns[i])
+    plt.plot(lon_ns[i] - 1.25, int_ns[i], label=elementos[i])
     plt.plot(lon_max[i], int_max[i],'o')
     for j in range(len(teo_lines[i])):
         plt.vlines(teo_lines[i][j], ymin = 0, ymax = 1,linestyle = 'dashed', color = 'black')
+    plt.legend()
     plt.show()
+    
+
+
