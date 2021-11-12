@@ -160,11 +160,18 @@ int_ll, int_le = ints
 
 #%%
 
-fig, (ax1, ax2) = plt.subplots(2,1, figsize=(12, 10), sharex = True)
-fig.tight_layout()
+fig, (ax1, ax2) = plt.subplots(2,1, figsize=(12, 8), sharex = True)
 for i in range(len(int_ll)):
-    ax1.plot(lon_ll[i], int_ll[i], label  = i)
-    ax2.plot(lon_le[i], int_le[i], label = i)
+    ax1.plot(lon_ll[i], int_ll[i], label  = laminado[i])
+    ax2.plot(lon_le[i], int_le[i], label = laminado[i])
+    
+ax1.set_ylabel("Intensidad plasmones mirando\n a la lámpara", fontsize=20)
+ax2.set_ylabel("Intensidad plasmones mirando\n al espectrómetro", fontsize=20)
+ax2.set_xlabel("Longitud de onda [nm]", fontsize=20)
+plt.subplots_adjust(hspace=0)
+fig.tight_layout()
+ax1.grid()
+ax2.grid()
 ax1.legend()
 ax2.legend()
 plt.show()
