@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
+import os
 
-def importar_datos(lista, path):
+
+def importar_datos(lista, path = str(os.getcwd())):
     '''
     Importar siempre primero el dato de la lampara halogena y despues los datos de los distintos cubre objetos
 
