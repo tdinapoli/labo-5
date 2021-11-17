@@ -29,6 +29,31 @@ def importar_datos(lista, path = str(os.getcwd())):
     return longitudes_de_onda, intensidades
     
 
+def importar_datos2(lista, path = str(os.getcwd())):
+    '''
+    Importar siempre primero el dato de la lampara halogena y despues los datos de los distintos cubre objetos
+
+    Parameters
+    ----------
+    lista : lista con los nombres de los datos a importar siempre con la lampara halogena al principio
+    pe: [l_00, t_05, t_10]
+    
+    path : path donde se encuentran los csv
+    
+    Returns
+    -------
+    Listas con las longitudes de onda e intensidades medidas por el espectrometro
+    '''
+    longitudes_de_onda = []
+    intensidades       = []
+    for i in lista:
+        data = np.loadtxt(open(path+i+'.csv').readlines()[:-1], skiprows = 33, delimiter = ',')
+        longitudes_de_onda.append(data[:,0])
+        intensidades.append(data[:,1])
+    
+    return longitudes_de_onda, intensidades
+    
+
 
 def calc_absorbancia(intensidades):
     '''
@@ -91,13 +116,92 @@ def grafico(lista, MA, MSTD):
     plt.show()
     
     return
-#%%
-# lista = ['00', '05', '20', '35', '50', '85']
-# path  = 'data/dia 2/s1_e'
-#lista = [nombre_lampara, nombre, cubrimiento_oro1, ...]
-#path = D:/...
-longitudes, intensidades = importar_datos(lista, path)
-abosrbancias = calc_absorbancia(intensidades)
-MA, MSTD = moving_avrege_y_std(abosrbancias)
-grafico(lista, MA, MSTD)
+#%% Importo los datos del dia 2 y del dia 4
+lista1 = ['lampara_halogena_t_2100']
+laminado = ['05', '20', '35', '50', '85']
+for i in laminado:
+    lista1.append('s2_e'+ i+ '_t_2100')
 
+path1 = 'data/dia 2/'
+
+lista2 = ['lampara', '05_le_t_38', '07_le_t_38', '10_le_t_38']
+path2 = 'data/dia 4/'
+
+
+lista_azul = ['lampara_azul', '00_azul', '05_azul', '07_azul', '10_azul']
+path3 = 'data/dia 4/'
+
+longitudes1, intensidades1 = importar_datos(lista1, path1)
+abosrbancias1 = calc_absorbancia(intensidades1)
+MA1, MSTD1 = moving_avrege_y_std(abosrbancias1)
+
+longitudes2, intensidades2 = importar_datos(lista2, path2)
+abosrbancias2 = calc_absorbancia(intensidades2)
+MA2, MSTD2 = moving_avrege_y_std(abosrbancias2)
+
+longitudes3, intensidades3 = importar_datos2(lista_azul, path3)
+abosrbancias3 = calc_absorbancia(intensidades3)
+MA3, MSTD3 = moving_avrege_y_std(abosrbancias3)
+
+#%% Hago dos figuras, una para los datos de la absorbancia del dia 2 y dia 4 de las laminas de oro, y otra para los de azul de metileno
+
+MA = [MA1, MA2, MA3]
+MSTD = [MSTD1, MSTD2, MSTD3]
+lista = [lista1, lista2, lista_azul]
+lista = [['lampara', '05 dia2', '20', '35', '50', '85'],['lampara2', '05 dia4', '07', '10'], ['lamapra_azul', '00_azul', '05_azul','07_azul', '10_azul']]
+longitudes = [longitudes1, longitudes2, longitudes3]
+fig, ax = plt.subplots(1, figsize=(6,10))
+
+for j in range(len(MA)):
+    if j<2:
+        colores = ["#c29b92","#d29182","#da8267","#e37750","#ea6f3a","#f36828","#b45124","#773518","#3b180d","#010005"]
+        labels = {"fontname":"Times New Roman", "fontsize":15}
+        todo = {"family": "sans-serif", "sans-serif":["Times New Roman"]}
+        rc("font", **todo)
+    #    fig, ax = plt.subplots(1, figsize=(6,10)
+        for i, ma in enumerate(MA[j]):
+            if j == 0:
+                color = colores[-i-1]
+                ax.plot(longitudes[j][i+1], ma,  color = color, label = lista[j][i+1] + 's')
+            else:
+                color = colores[-i-1 -len(MA[0])]
+                ax.plot(longitudes[j][i+1], ma,  color = color, label = lista[j][i+1] + 's')
+
+                ax.fill_between(longitudes[i+1], MA[j][i]+MSTD[j][i], MA[j][i]-MSTD[j][i],
+                                color= color,  alpha = 0.2, linewidth = 0)
+        ax.set_yticks(np.arange(0, 0.55, 0.05))
+        ax.set_ylim([0, 0.5])
+        ax.grid(alpha=0.5)
+        ax.set_xlabel("Longitud de onda [nm]", **labels)
+        ax.set_ylabel("Absorbancia", **labels)
+        ax.set_xlim([400, 1000])
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles[::-1], labels[::-1], fontsize=15, loc="upper left", framealpha=1)
+        ax.tick_params(labelsize=12)
+        plt.show()
+
+        
+    else:
+        
+        fig, ax = plt.subplots(1, figsize=(6,10))
+        colores = ["#c29b92","#d29182","#da8267","#e37750","#ea6f3a","#f36828","#b45124","#773518","#3b180d","#010005"]
+        labels = {"fontname":"Times New Roman", "fontsize":15}
+        todo = {"family": "sans-serif", "sans-serif":["Times New Roman"]}
+        rc("font", **todo)
+    #    fig, ax = plt.subplots(1, figsize=(6,10))
+        for i, ma in enumerate(MA[j]):
+            color = colores[-i-1]
+            ax.plot(longitudes[j][i+1], ma,  label = lista[j][i+1] + 's')
+            #ax.fill_between(longitudes[i+1], MA[i]+MSTD[i], MA[i]-MSTD[i],
+             #               color= color,  alpha = 0.2, linewidth = 0)
+        ax.set_yticks(np.arange(0, 0.55, 0.05))
+        ax.set_ylim([0, 0.5])
+        ax.grid(alpha=0.5)
+        ax.set_xlabel("Longitud de onda [nm]", **labels)
+        ax.set_ylabel("Absorbancia", **labels)
+        ax.set_xlim([400, 1000])
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles[::-1], labels[::-1], fontsize=15, loc="upper left", framealpha=1)
+        ax.tick_params(labelsize=12)
+        plt.show()
+      
