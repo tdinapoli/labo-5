@@ -59,12 +59,13 @@ for i in range(len(elementos)):
 
 for i in range(len(elementos)):
     plt.figure()
-    plt.plot(lon_ns[i]-1.25, int_ns[i], label=elementos[i], color = 'black')
-    plt.plot(lon_max[i]-1.25, int_max[i],'go')
+    plt.plot(lon_ns[i]-1.24, int_ns[i], label=elementos[i], color = 'black')
+    plt.plot(lon_max[i]-1.24, int_max[i],'o', color = 'royalblue', markersize = 4)
     for j in range(len(teo_lines[i])):
         plt.vlines(teo_lines[i][j], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = 'orangered', linewidth = 1)
     plt.legend()
     plt.show()
+    break
 #%%Doblete del sodio
 data =  np.loadtxt(open("data/dia 1/sodio_doblete.csv").readlines()[:-1], skiprows = 33, delimiter = ';')
 lon_so = data[:,0]
@@ -80,5 +81,3 @@ for i in range(len(teo_lines[-1])):
     plt.vlines(teo_lines[-1][i], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = 'orangered', linewidth = 1)
 plt.legend()
 plt.show()
-
-

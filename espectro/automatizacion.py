@@ -166,9 +166,11 @@ for j in range(len(MA)):
             else:
                 color = colores[-i-1 -len(MA[0])]
                 ax.plot(longitudes[j][i+1], ma,  color = color, label = lista[j][i+1] + 's')
+                
 
-                ax.fill_between(longitudes[i+1], MA[j][i]+MSTD[j][i], MA[j][i]-MSTD[j][i],
-                                color= color,  alpha = 0.2, linewidth = 0)
+                #ax.fill_between(longitudes[i+1], MA[j][i]+MSTD[j][i], MA[j][i]-MSTD[j][i],
+                 #               color= color,  alpha = 0.2, linewidth = 0)
+        ax.axvline(533, linestyle = 'dashed')
         ax.set_yticks(np.arange(0, 0.55, 0.05))
         ax.set_ylim([0, 0.5])
         ax.grid(alpha=0.5)
