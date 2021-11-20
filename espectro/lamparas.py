@@ -63,9 +63,11 @@ for i in range(len(elementos)):
     plt.plot(lon_max[i]-1.24, int_max[i],'o', color = 'royalblue', markersize = 4)
     for j in range(len(teo_lines[i])):
         plt.vlines(teo_lines[i][j], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = 'orangered', linewidth = 1)
-    plt.legend()
+    plt.legend(('Espectro medido', 'Máximos locales','Lineas NIST'), fontsize=14)
+    plt.xlabel('Longitud de onda [nm]')
+    plt.ylabel('Intensidad')
     plt.show()
-    break
+    
 #%%Doblete del sodio
 data =  np.loadtxt(open("data/dia 1/sodio_doblete.csv").readlines()[:-1], skiprows = 33, delimiter = ';')
 lon_so = data[:,0]

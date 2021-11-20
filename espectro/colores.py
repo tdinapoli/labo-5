@@ -31,18 +31,34 @@ colors = ['green', 'yellow', 'orange', 'red', 'blue']
 plt.figure()
 #plt.plot(lon_lampara, int_lampara, label = 'lampara')
 for i in range(len(colores_celofan)):
-    plt.plot(lon_papel[i], -np.log10(int_papel[i]/int_lampara),color= colors[i] ,label = colores_celofan[i])
-plt.legend()
+    plt.plot(lon_papel[i], -np.log10(int_papel[i]/int_lampara),color= colors[i] ,label = colores_celofan[i], linewidth = 1.5)
+plt.xlim([200, 1000])
+plt.ylim([-0.2, 1.2])
+plt.legend(fontsize=14)
+plt.xlabel('Longitud de onda [nm]')
+plt.ylabel('Intensidad')
 plt.show()
 
 #%%
 
 plt.figure()
+colores_RGB = ['Rojo', 'Verde', 'Azul']
 colors = ['red', 'green', 'blue']
+colores_prefijos = [630, 532, 465]
 for i in range(len(RGB)):
-    plt.plot(lon_RGB[i], int_RGB[i], color= colors[i],label = RGB[i])
+    plt.plot(lon_RGB[i], int_RGB[i], color= colors[i],label = colores_RGB[i], linewidth = 1.5)
+    plt.vlines(colores_prefijos[i], ymin = 0, ymax = 1, color = colors[i], alpha = 0.3, linestyle = 'dashed')
+    
+plt.legend(fontsize=14)
+plt.xlabel('Longitud de onda [nm]')
+plt.ylabel('Intensidad')
 plt.show()
 
+
+
+
+
+#%%
 #%%
 import os
 

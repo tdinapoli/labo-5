@@ -135,6 +135,7 @@ longitudes1, intensidades1 = importar_datos(lista1, path1)
 abosrbancias1 = calc_absorbancia(intensidades1)
 MA1, MSTD1 = moving_avrege_y_std(abosrbancias1)
 
+
 longitudes2, intensidades2 = importar_datos(lista2, path2)
 abosrbancias2 = calc_absorbancia(intensidades2)
 MA2, MSTD2 = moving_avrege_y_std(abosrbancias2)
