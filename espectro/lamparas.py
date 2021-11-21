@@ -67,7 +67,7 @@ font = {'family' : 'arial'}
 
 colores = ["#e79194","#ed9598","#f3989c","#fe9fa3","#d88496","#c57790","#b16989"]
 for i in range(len(elementos)):
-    if i == 5:
+    if i == 3:
         plt.figure(facecolor = 'w')
         plt.plot(lon_ns[i]-1.24, int_ns[i], label=elementos[i], color = COLOR)
         plt.plot(lon_max[i]-1.24, int_max[i],'o', color = colores[5], markersize = 4)
@@ -78,7 +78,7 @@ for i in range(len(elementos)):
         plt.yticks(fontsize = 12)
         plt.xlabel('Longitud de onda [nm]', fontsize = 14)
         plt.ylabel('Intensidad normalizada', fontsize = 14)
-        plt.savefig('argon_zoom.png', transparent = True,dpi = 1000)
+        #plt.savefig('argon_zoom.png', transparent = True,dpi = 1000)
         plt.show()
     
 #%%Doblete del sodio
@@ -89,7 +89,7 @@ find_peks = fp(int_so, height = 0.02)
 lon_max_so = lon_so[find_peks[0]]
 int_max_so = int_so[find_peks[0]]
 
-plt.figure(facecolor = 'w')
+plt.figure(facecolor = 'w', figsize = (15,8))
 plt.plot(lon_so-1.24, int_so, label = 'so', color = COLOR)
 plt.plot(lon_max_so-1.24, int_max_so,'o', color = colores[5], markersize=4)
 for i in range(len(teo_lines[-1])):
@@ -99,7 +99,8 @@ plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
 plt.xlabel('Longitud de onda [nm]', fontsize = 14)
 plt.ylabel('Intensidad normalizada', fontsize = 14)
-plt.xlim([588,591])
-plt.ylim([0, 0.25])
-plt.savefig('sodio_zoom.png', transparent = True,dpi = 1000)
+plt.xlim([200,1000])
+plt.ylim([-0.002, 0.18])
+plt.grid(alpha = 0.5)
+plt.savefig('sodio.png', transparent = True,dpi = 1000)
 plt.show()

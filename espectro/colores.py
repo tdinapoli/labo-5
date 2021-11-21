@@ -43,7 +43,7 @@ mpl.rcParams['xtick.color'] = COLOR
 mpl.rcParams['ytick.color'] = COLOR
 font = {'family' : 'arial'}
 
-plt.figure(facecolor = 'w')
+plt.figure(facecolor = 'w', figsize = (15, 8))
 #plt.plot(lon_lampara, int_lampara, label = 'lampara')
 for i in range(len(colores_celofan)):
     plt.plot(lon_papel[i]-1.24, -np.log10(int_papel[i]/int_lampara),color= colors[i] ,label = colores_celofan[i], linewidth = 1.5)
@@ -51,9 +51,10 @@ plt.xlim([200, 1000])
 plt.ylim([-0.2, 1.2])
 plt.xticks(fontsize = 12)
 plt.yticks(fontsize = 12)
-plt.xlabel('Longitud de onda [nm]', fontsize = 14)
-plt.ylabel('Absorbancia', fontsize = 14)
-plt.legend(fontsize = 12)
+plt.grid(alpha = 0.5)
+plt.xlabel('Longitud de onda [nm]', fontsize = 16)
+plt.ylabel('Absorbancia', fontsize = 16)
+plt.legend(fontsize = 16)
 plt.savefig('celofan.png', transparent = True, dpi = 1000)
 plt.show()
 

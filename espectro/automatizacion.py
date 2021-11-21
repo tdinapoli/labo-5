@@ -161,14 +161,14 @@ mpl.rcParams['ytick.color'] = COLOR
 font = {'family' : 'arial'}
 rc('font', **font)
 
-#colores = ["#c29b92","#d29182","#da8267","#e37750","#ea6f3a","#f36828","#b45124","#773518","#3b180d","#010005"]
-colores = ["#e79194","#ed9598","#f3989c","#fe9fa3","#d88496","#c57790","#b16989"]
+colores = ["#c29b92","#d29182","#da8267","#e37750","#ea6f3a","#f36828","#b45124","#773518","#3b180d","#010005"]
+#colores = ["#e79194","#ed9598","#f3989c","#fe9fa3","#d88496","#c57790","#b16989"]
 
 longitudes = longitudes1[2:]+ longitudes2[1:]
 lista = ['5s', '7s', '10s', '20s', '35s', '50s', '85s']
 plt.figure(facecolor = 'w', figsize=(6,10))
 for i in range(len(MA[0])):
-    plt.plot(longitudes[i], MA[0][i],  color = colores[-i-1], label = lista[i])
+    plt.plot(longitudes[i]-1.24, MA[0][i],  color = colores[-i-1], label = lista[i])
     print('hola')
 plt.vlines(532, ymin = 0, ymax = 0.5, linestyle = 'dashed', label = '532 nm')
 plt.grid(0.5)
@@ -177,8 +177,50 @@ plt.yticks(fontsize = 12)
 plt.xlabel('Longitud de onda [nm]', fontsize = 14)
 plt.ylabel('Absorbancia', fontsize = 14)
 plt.legend(fontsize = 12, loc = 'upper left')
-plt.savefig('oro_2.png', transparent = True, dpi = 1000)
+plt.xlim([400, 900])
+#plt.savefig('oro_zoom.png', transparent = True, dpi = 1000)
 plt.show()
+#%%
+
+import matplotlib as mpl
+COLOR = '#494949'
+mpl.rcParams['text.color'] = COLOR
+mpl.rcParams['axes.labelcolor'] = COLOR
+mpl.rcParams['xtick.color'] = COLOR
+mpl.rcParams['ytick.color'] = COLOR
+font = {'family' : 'arial'}
+rc('font', **font)
+
+lognitudes = longitudes3
+plt.figure(facecolor = 'w', figsize=(15,8))
+plt.plot(longitudes[i]-1.24, MA[1][0],  color = '#4ea0db')
+plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+plt.ylabel('Absorbancia', fontsize = 14)
+plt.grid(alpha = 0.5)
+plt.xlim([400,1000])
+
+#plt.savefig('azul.png', transparent = True, dpi = 1000)
+
+#%%
+longitudes_notch, intensidadesnotch = importar_datos2(['filtro_notcho_luz_natural'], 'data/dia 4/')
+
+
+import matplotlib as mpl
+COLOR = '#494949'
+mpl.rcParams['text.color'] = COLOR
+mpl.rcParams['axes.labelcolor'] = COLOR
+mpl.rcParams['xtick.color'] = COLOR
+mpl.rcParams['ytick.color'] = COLOR
+font = {'family' : 'arial'}
+rc('font', **font)
+plt.figure(facecolor = 'w', figsize =(15,8))
+plt.plot(longitudes_notch[0]-1.24, intensidadesnotch[0], color = COLOR)
+plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+plt.ylabel('Intensidad normalizada', fontsize = 14)
+plt.vlines(532, ymin = 0, ymax = 1, linestyle = 'dashed', color = '#ff744d')
+plt.grid(alpha = 0.5)
+plt.savefig('notch.png', transparent = True, dpi = 1000)
+
 
 
 #%%
