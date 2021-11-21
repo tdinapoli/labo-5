@@ -56,17 +56,30 @@ for i in range(len(elementos)):
     
 
 #%% Ploteo los resultados en 7 figuras distintas
+import matplotlib as mpl
 
+COLOR = '#494949'
+mpl.rcParams['text.color'] = COLOR
+mpl.rcParams['axes.labelcolor'] = COLOR
+mpl.rcParams['xtick.color'] = COLOR
+mpl.rcParams['ytick.color'] = COLOR
+font = {'family' : 'arial'}
+
+colores = ["#e79194","#ed9598","#f3989c","#fe9fa3","#d88496","#c57790","#b16989"]
 for i in range(len(elementos)):
-    plt.figure()
-    plt.plot(lon_ns[i]-1.24, int_ns[i], label=elementos[i], color = 'black')
-    plt.plot(lon_max[i]-1.24, int_max[i],'o', color = 'royalblue', markersize = 4)
-    for j in range(len(teo_lines[i])):
-        plt.vlines(teo_lines[i][j], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = 'orangered', linewidth = 1)
-    plt.legend(('Espectro medido', 'Máximos locales','Lineas NIST'), fontsize=14)
-    plt.xlabel('Longitud de onda [nm]')
-    plt.ylabel('Intensidad')
-    plt.show()
+    if i == 5:
+        plt.figure(facecolor = 'w')
+        plt.plot(lon_ns[i]-1.24, int_ns[i], label=elementos[i], color = COLOR)
+        plt.plot(lon_max[i]-1.24, int_max[i],'o', color = colores[5], markersize = 4)
+        for j in range(len(teo_lines[i])):
+            plt.vlines(teo_lines[i][j], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = '#ff744d', linewidth = 1, alpha = 0.7)
+        plt.legend(('Espectro medido', 'Máximos locales','Lineas NIST'), fontsize=12)
+        plt.xticks(fontsize = 12)
+        plt.yticks(fontsize = 12)
+        plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+        plt.ylabel('Intensidad normalizada', fontsize = 14)
+        plt.savefig('argon_zoom.png', transparent = True,dpi = 1000)
+        plt.show()
     
 #%%Doblete del sodio
 data =  np.loadtxt(open("data/dia 1/sodio_doblete.csv").readlines()[:-1], skiprows = 33, delimiter = ';')
@@ -75,11 +88,18 @@ int_so = data[:,1]
 find_peks = fp(int_so, height = 0.02)
 lon_max_so = lon_so[find_peks[0]]
 int_max_so = int_so[find_peks[0]]
-plt.figure()
-plt.plot(lon_so-1.24, int_so, label = 'so', color = 'black')
-plt.plot(lon_max_so-1.24, int_max_so,'go')
 
+plt.figure(facecolor = 'w')
+plt.plot(lon_so-1.24, int_so, label = 'so', color = COLOR)
+plt.plot(lon_max_so-1.24, int_max_so,'o', color = colores[5], markersize=4)
 for i in range(len(teo_lines[-1])):
-    plt.vlines(teo_lines[-1][i], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = 'orangered', linewidth = 1)
-plt.legend()
+    plt.vlines(teo_lines[-1][i], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = '#ff744d', linewidth = 1, alpha = 0.7)
+plt.legend(('Espectro medido', 'Máximos locales','Lineas NIST'), fontsize=12)
+plt.xticks(fontsize = 12)
+plt.yticks(fontsize = 12)
+plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+plt.ylabel('Intensidad normalizada', fontsize = 14)
+plt.xlim([588,591])
+plt.ylim([0, 0.25])
+plt.savefig('sodio_zoom.png', transparent = True,dpi = 1000)
 plt.show()

@@ -145,12 +145,43 @@ abosrbancias3 = calc_absorbancia(intensidades3)
 MA3, MSTD3 = moving_avrege_y_std(abosrbancias3)
 
 #%% Hago dos figuras, una para los datos de la absorbancia del dia 2 y dia 4 de las laminas de oro, y otra para los de azul de metileno
+MA = [MA2 + MA1[1:], MA3]
+#MA = [MA1, MA2, MA3]
+#MSTD = [MSTD1, MSTD2, MSTD3]
+# lista = [lista1, lista2, lista_azul]
+# lista = [['lampara', '05 dia2', '20', '35', '50', '85'],['lampara2', '05 dia4', '07', '10'], ['lamapra_azul', '00_azul', '05_azul','07_azul', '10_azul']]
+# longitudes = [longitudes1, longitudes2, longitudes3]
 
-MA = [MA1, MA2, MA3]
-MSTD = [MSTD1, MSTD2, MSTD3]
-lista = [lista1, lista2, lista_azul]
-lista = [['lampara', '05 dia2', '20', '35', '50', '85'],['lampara2', '05 dia4', '07', '10'], ['lamapra_azul', '00_azul', '05_azul','07_azul', '10_azul']]
-longitudes = [longitudes1, longitudes2, longitudes3]
+import matplotlib as mpl
+COLOR = '#494949'
+mpl.rcParams['text.color'] = COLOR
+mpl.rcParams['axes.labelcolor'] = COLOR
+mpl.rcParams['xtick.color'] = COLOR
+mpl.rcParams['ytick.color'] = COLOR
+font = {'family' : 'arial'}
+rc('font', **font)
+
+#colores = ["#c29b92","#d29182","#da8267","#e37750","#ea6f3a","#f36828","#b45124","#773518","#3b180d","#010005"]
+colores = ["#e79194","#ed9598","#f3989c","#fe9fa3","#d88496","#c57790","#b16989"]
+
+longitudes = longitudes1[2:]+ longitudes2[1:]
+lista = ['5s', '7s', '10s', '20s', '35s', '50s', '85s']
+plt.figure(facecolor = 'w', figsize=(6,10))
+for i in range(len(MA[0])):
+    plt.plot(longitudes[i], MA[0][i],  color = colores[-i-1], label = lista[i])
+    print('hola')
+plt.vlines(532, ymin = 0, ymax = 0.5, linestyle = 'dashed', label = '532 nm')
+plt.grid(0.5)
+plt.xticks(fontsize = 12)
+plt.yticks(fontsize = 12)
+plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+plt.ylabel('Absorbancia', fontsize = 14)
+plt.legend(fontsize = 12, loc = 'upper left')
+plt.savefig('oro_2.png', transparent = True, dpi = 1000)
+plt.show()
+
+
+#%%
 fig, ax = plt.subplots(1, figsize=(6,10))
 
 for j in range(len(MA)):

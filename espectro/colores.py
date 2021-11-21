@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks as fp 
+from matplotlib import rc
+import matplotlib.font_manager as font_manager
+import matplotlib.font_manager as fm
+
 #%%
 data_lamapra = np.loadtxt(open('data/dia 2/lampara_halogena_t_2100.csv').readlines()[:-1], skiprows = 33, delimiter = ';')
 int_lampara = data_lamapra[:,1]
@@ -27,35 +31,81 @@ for i in RGB:
 
 
 #%%
-colors = ['green', 'yellow', 'orange', 'red', 'blue']
-plt.figure()
+import matplotlib as mpl
+
+colors = ['#0A9396', '#EE9B00', '#CA6702', '#AE2012', '#005F73']
+colores_celofan = ['Verde', 'Amarillo', 'Naranja', 'Rojo', 'Azul']
+
+COLOR = '#494949'
+mpl.rcParams['text.color'] = COLOR
+mpl.rcParams['axes.labelcolor'] = COLOR
+mpl.rcParams['xtick.color'] = COLOR
+mpl.rcParams['ytick.color'] = COLOR
+font = {'family' : 'arial'}
+
+plt.figure(facecolor = 'w')
 #plt.plot(lon_lampara, int_lampara, label = 'lampara')
 for i in range(len(colores_celofan)):
-    plt.plot(lon_papel[i], -np.log10(int_papel[i]/int_lampara),color= colors[i] ,label = colores_celofan[i], linewidth = 1.5)
+    plt.plot(lon_papel[i]-1.24, -np.log10(int_papel[i]/int_lampara),color= colors[i] ,label = colores_celofan[i], linewidth = 1.5)
 plt.xlim([200, 1000])
 plt.ylim([-0.2, 1.2])
-plt.legend(fontsize=14)
-plt.xlabel('Longitud de onda [nm]')
-plt.ylabel('Intensidad')
+plt.xticks(fontsize = 12)
+plt.yticks(fontsize = 12)
+plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+plt.ylabel('Absorbancia', fontsize = 14)
+plt.legend(fontsize = 12)
+plt.savefig('celofan.png', transparent = True, dpi = 1000)
+plt.show()
+
+#%%
+#csfont = {'fontname':'Roboto Condensed'}
+#prop = fm.FontProperties(fname="Roboto Condensed")
+import matplotlib as mpl
+COLOR = '#494949'
+mpl.rcParams['text.color'] = COLOR
+mpl.rcParams['axes.labelcolor'] = COLOR
+mpl.rcParams['xtick.color'] = COLOR
+mpl.rcParams['ytick.color'] = COLOR
+font = {'family' : 'arial'}
+
+rc('font', **font)
+#font = font_manager.FontProperties(family='Roboto Condensed', size=14)
+plt.figure(facecolor = 'w')
+colores_RGB = ['Rojo', 'Verde', 'Azul']
+colors = ['#e63946', '#90be6d', '#0077B6']
+colores_prefijos = [630, 532, 465]
+for i in range(len(RGB)):
+    plt.plot(lon_RGB[i]-1.24, int_RGB[i], color= colors[i],label = colores_RGB[i], linewidth = 1.5)
+    plt.vlines(colores_prefijos[i], ymin = 0, ymax = 1, color = colors[i], alpha = 0.3, linestyle = 'dashed')
+    
+plt.xticks(fontsize = 12)
+plt.yticks(fontsize = 12)
+plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+plt.ylabel('Intensidad normalizada', fontsize = 14)
+plt.legend(fontsize = 12)
+plt.savefig('RGB.png', transparent = True, dpi = 1000)
 plt.show()
 
 #%%
 
-plt.figure()
-colores_RGB = ['Rojo', 'Verde', 'Azul']
-colors = ['red', 'green', 'blue']
-colores_prefijos = [630, 532, 465]
-for i in range(len(RGB)):
-    plt.plot(lon_RGB[i], int_RGB[i], color= colors[i],label = colores_RGB[i], linewidth = 1.5)
-    plt.vlines(colores_prefijos[i], ymin = 0, ymax = 1, color = colors[i], alpha = 0.3, linestyle = 'dashed')
-    
-plt.legend(fontsize=14)
-plt.xlabel('Longitud de onda [nm]')
-plt.ylabel('Intensidad')
+COLOR = '#494949'
+mpl.rcParams['text.color'] = COLOR
+mpl.rcParams['axes.labelcolor'] = COLOR
+mpl.rcParams['xtick.color'] = COLOR
+mpl.rcParams['ytick.color'] = COLOR
+font = {'family' : 'arial'}
+
+plt.figure(facecolor = 'w')
+plt.plot(lon_lampara, int_lampara, color = COLOR)
+# plt.xlim([200, 1000])
+# plt.ylim([-0.2, 1.2])
+plt.xticks(fontsize = 12)
+plt.yticks(fontsize = 12)
+plt.xlabel('Longitud de onda [nm]', fontsize = 14)
+plt.ylabel('Intensidad normalizada', fontsize = 14)
+#plt.legend(fontsize = 12)
+plt.savefig('lampara.png', transparent = True, dpi = 1000)
 plt.show()
-
-
-
 
 
 #%%
