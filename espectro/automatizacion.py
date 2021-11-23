@@ -218,6 +218,8 @@ plt.plot(longitudes_notch[0]-1.24, intensidadesnotch[0], color = COLOR)
 plt.xlabel('Longitud de onda [nm]', fontsize = 14)
 plt.ylabel('Intensidad normalizada', fontsize = 14)
 plt.vlines(532, ymin = 0, ymax = 1, linestyle = 'dashed', color = '#ff744d')
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
 plt.grid(alpha = 0.5)
 plt.savefig('notch.png', transparent = True, dpi = 1000)
 
