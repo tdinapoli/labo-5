@@ -47,7 +47,7 @@ for i in range(len(intensidades)):
         plt.yscale('log')
         plt.ylim([0, 1])
         #plt.legend(fontsize = 12, loc = 'upper left')
-plt.savefig('intensidad_relativa_log.pdf', transparent = True, dpi = 1000)
+#plt.savefig('intensidad_relativa_log.pdf', transparent = True, dpi = 1000)
 
 #%%
 import matplotlib as mpl
@@ -76,6 +76,7 @@ plt.yticks(fontsize = 12)
 plt.xlabel('Longitud de onda [nm]', fontsize = 14)
 ax1.set_ylabel('Intensidad normalizada', fontsize = 14)
 ax2.set_ylabel('Intensidad normalizada', fontsize = 14)
-ax2.legend(('intensidad medida', 'picos de Raman teoricos'),fontsize = 12, loc = 'upper right')
+ax2.legend(('intensidad medida', 'picos de Raman esperados'),fontsize = 12, loc = 'upper right')
 #plt.legend(fontsize = 12, loc = 'upper left')
-plt.savefig('int_laser_raman.png', transparent = True, dpi = 1000)
+#plt.savefig('int_laser_raman.png', transparent = True, dpi = 1000)
+plt.savefig('int_laser_y_raman.pdf', transparent = True)

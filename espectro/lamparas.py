@@ -67,18 +67,20 @@ font = {'family' : 'arial'}
 
 colores = ["#e79194","#ed9598","#f3989c","#fe9fa3","#d88496","#c57790","#b16989"]
 for i in range(len(elementos)):
-    if i == 3:
+    if i == 5:
         plt.figure(facecolor = 'w')
         plt.plot(lon_ns[i]-1.24, int_ns[i], label=elementos[i], color = COLOR)
         plt.plot(lon_max[i]-1.24, int_max[i],'o', color = colores[5], markersize = 4)
         for j in range(len(teo_lines[i])):
             plt.vlines(teo_lines[i][j], ymin = 0, ymax = 1.05,linestyle = 'dashed', color = '#ff744d', linewidth = 1, alpha = 0.7)
-        plt.legend(('Espectro medido', 'Máximos locales','Lineas NIST'), fontsize=12)
+        plt.legend(('Espectro medido', 'Máximos locales','Lineas NIST'), fontsize=12, loc = 'upper right')
         plt.xticks(fontsize = 12)
         plt.yticks(fontsize = 12)
         plt.xlabel('Longitud de onda [nm]', fontsize = 14)
         plt.ylabel('Intensidad normalizada', fontsize = 14)
+        #plt.xlim([680, 975])
         #plt.savefig('argon_zoom.png', transparent = True,dpi = 1000)
+        plt.savefig('argon.pdf', transparent = True)
         plt.show()
     
 #%%Doblete del sodio
