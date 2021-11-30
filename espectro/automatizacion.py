@@ -166,20 +166,20 @@ colores = ["#c29b92","#d29182","#da8267","#e37750","#ea6f3a","#f36828","#b45124"
 
 longitudes = longitudes1[2:]+ longitudes2[1:]
 lista = ['5s', '7s', '10s', '20s', '35s', '50s', '85s']
-plt.figure(facecolor = 'w', figsize=(15,9))
+plt.figure(facecolor = 'w', figsize=(7,10))
 for i in range(len(MA[0])):
     plt.plot(longitudes[i]-1.24, MA[0][i],  color = colores[-i-1], label = lista[i])
     print('hola')
-#plt.vlines(532, ymin = 0, ymax = 0.5, linestyle = 'dashed', label = '532 nm')
+plt.vlines(532, ymin = 0, ymax = 0.5, linestyle = 'dashed', label = '532 nm')
 plt.grid(0.5)
-plt.xticks(fontsize = 12)
-plt.yticks(fontsize = 12)
-plt.xlabel('Longitud de onda [nm]', fontsize = 14)
-plt.ylabel('Absorbancia', fontsize = 14)
-plt.legend(fontsize = 12, loc = 'upper left')
-#plt.xlim([400, 900])
+plt.xticks(fontsize = 16)
+plt.yticks(fontsize = 16)
+plt.xlabel('Longitud de onda [nm]', fontsize = 18)
+plt.ylabel('Absorbancia', fontsize = 18)
+plt.legend(fontsize = 16, loc = 'upper left')
+plt.xlim([400, 1000])
 #plt.savefig('oro_zoom.png', transparent = True, dpi = 1000)
-plt.savefig('oro.pdf', transparent = True)
+plt.savefig('oro_400.pdf', transparent = True)
 plt.show()
 #%%
 
@@ -195,12 +195,14 @@ rc('font', **font)
 lognitudes = longitudes3
 plt.figure(facecolor = 'w', figsize=(15,8))
 plt.plot(longitudes[i]-1.24, MA[1][0],  color = '#4ea0db')
-plt.xlabel('Longitud de onda [nm]', fontsize = 14)
-plt.ylabel('Absorbancia', fontsize = 14)
+plt.xlabel('Longitud de onda [nm]', fontsize = 18)
+plt.ylabel('Absorbancia', fontsize = 18)
+plt.xticks(fontsize = 16)
+plt.yticks(fontsize = 16)
 plt.grid(alpha = 0.5)
 plt.xlim([400,1000])
 
-#plt.savefig('azul.png', transparent = True, dpi = 1000)
+plt.savefig('azul.pdf', transparent = True)
 
 #%%
 longitudes_notch, intensidadesnotch = importar_datos2(['filtro_notcho_luz_natural'], 'data/dia 4/')

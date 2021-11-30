@@ -96,16 +96,17 @@ mpl.rcParams['xtick.color'] = COLOR
 mpl.rcParams['ytick.color'] = COLOR
 font = {'family' : 'arial'}
 
-plt.figure(facecolor = 'w')
+plt.figure(facecolor = 'w', figsize =(15, 8))
 plt.plot(lon_lampara, int_lampara, color = COLOR)
 # plt.xlim([200, 1000])
 # plt.ylim([-0.2, 1.2])
-plt.xticks(fontsize = 12)
-plt.yticks(fontsize = 12)
-plt.xlabel('Longitud de onda [nm]', fontsize = 14)
-plt.ylabel('Intensidad normalizada', fontsize = 14)
+plt.xticks(fontsize = 16)
+plt.yticks(fontsize = 16)
+plt.xlabel('Longitud de onda [nm]', fontsize = 22)
+plt.ylabel('Intensidad normalizada', fontsize = 22)
 #plt.legend(fontsize = 12)
-plt.savefig('lampara.png', transparent = True, dpi = 1000)
+plt.grid(alpha = 0.7)
+plt.savefig('lampara_2.pdf', transparent = True)
 plt.show()
 
 
